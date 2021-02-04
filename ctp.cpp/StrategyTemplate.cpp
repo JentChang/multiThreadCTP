@@ -1,9 +1,11 @@
 #include "StrategyTemplate.h"
 
-StrategyTemplate::StrategyTemplate(TDEvent* tdevent, Indicators*indn)
+StrategyTemplate::StrategyTemplate(TDEvent* tdevent)
 {
 	this->tdevent = tdevent;
-	this->indn = indn;
+	this->indn = new Indicators();
+	this->__tick = TickInfomation();
+	this->__tick.datetime = "19990101 00:00:00";
 }
 
 StrategyTemplate::~StrategyTemplate()
@@ -14,19 +16,30 @@ StrategyTemplate::~StrategyTemplate()
 
 void StrategyTemplate::InIt()
 {
-	this->__InstrumentID = "rb2105";
+	///重写InIt
+	///策略初始化 参数等设计
 }
 
 void StrategyTemplate::ReceiveTick(TickInfomation tick)
 {
+	///重写RiceiverTick 
 	///不使用tick指针 它是一个时刻更新的量
 	StrategyTemplate::__tick = tick;
 	this->indn->make_bar(tick);
 	BarInfomation* bar = this->indn->bar();
 
+	///这里可以新增OnBar函数处理k线信息
+	if (this->indn->barclose())
+	{
+		///this->OnBar(bar);
+	}
 
 
 	return this->FunEnd();
+}
+
+void StrategyTemplate::OnBar(BarInfomation * bar)
+{
 }
 
 void StrategyTemplate::FunStart()
