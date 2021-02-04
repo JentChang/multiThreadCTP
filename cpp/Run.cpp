@@ -52,7 +52,7 @@ int main(int argc, char* argv[]) {
 	std::this_thread::sleep_for(std::chrono::seconds(10));
 
 	
-	///mdevent
+	///mdevent 行情推送
 	MDEvent* mdevent = new MDEvent();
 	///start md
 	//	std::vector<CThostFtdcInstrumentField> instruments;
@@ -78,8 +78,7 @@ int main(int argc, char* argv[]) {
 
 	TDEvent* tdevent = new TDEvent(td);
 	///注册策略
-	Indicators* indn_rb_rsi = new Indicators();
-	StrategyTemplate* st = new Strategy_rb_rsi(tdevent, indn_rb_rsi);
+	StrategyTemplate* st = new Strategy_rb_rsi(tdevent);
 	mdevent->AddStrategy(st);
 	///启动
 	mdevent->StrategyStart();
