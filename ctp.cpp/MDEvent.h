@@ -28,6 +28,8 @@ private:
 	static vector<TickInfomation> __tick_vtr;
 	static vector<StrategyTemplate*> strategy_vtr;
 	vector<std::thread> thread_vtr;
+	static mutex mtx;
+
 };
 
 

@@ -173,6 +173,16 @@ void CtpMD::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField* pDepthMarketDat
 	tick_info.AveragePrice = pDepthMarketData->AveragePrice;
 	///业务日期
 	strcpy(tick_info.ActionDay, pDepthMarketData->ActionDay);
+
+	///时间
+	char mtime[4];
+	sprintf(mtime, "%d", tick_info.UpdateMillisec);
+	memcpy(tick_info.datetime, tick_info.TradingDay, sizeof(tick_info.TradingDay));
+	strcat(tick_info.datetime, " ");
+	strcat(tick_info.datetime, tick_info.UpdateTime);
+	strcat(tick_info.datetime, ".");
+	strcat(tick_info.datetime, mtime);
+
 	this->mdevent->AddTick(tick_info);
 
 	//std::cout << "OnRtnDepthMarketData,"

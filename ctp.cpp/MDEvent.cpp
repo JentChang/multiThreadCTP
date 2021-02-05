@@ -3,6 +3,7 @@
 
 vector<TickInfomation> MDEvent::__tick_vtr;
 vector<StrategyTemplate*> MDEvent::strategy_vtr;
+mutex MDEvent::mtx;
 
 MDEvent::MDEvent()
 {
@@ -29,15 +30,11 @@ void MDEvent::InsNum(int ins_num)
 int MDEvent::AddTick(TickInfomation tick)
 {
 	TickInfomation tick_info = tick;
-	
-	string day = tick_info.TradingDay;
-	string time = tick_info.UpdateTime;
-	string mtime = to_string(tick_info.UpdateMillisec);
 
-	tick_info.datetime = day + " " + time + "." + mtime;
-
+	MDEvent::mtx.lock();
 	this->__tick_vtr.push_back(tick_info);
 	this->__tick_vtr.erase(this->__tick_vtr.begin());
+	MDEvent::mtx.unlock();
 
 	return 0;
 }
@@ -71,18 +68,19 @@ void MDEvent::SendTickThreadFun(StrategyTemplate* st)
 {
 	while (true)
 	{
+		MDEvent::mtx.lock();
 		for (size_t i = 0; i < MDEvent::__tick_vtr.size(); i++)
 		{
 			TickInfomation tick = MDEvent::__tick_vtr.at(i);
 			if (!tick.EMPTY &&
-				tick.datetime > st->GetTick().datetime &&
+				strcmp(tick.datetime, st->GetTick().datetime) > 0 &&
 				strcmp(tick.InstrumentID, st->InstrumentID()) == 0
-
 				)
 			{
 				st->ReceiveTick(tick);
 			}
 		}
+		MDEvent::mtx.unlock();
 	}
 	
 }

@@ -5,7 +5,6 @@ StrategyTemplate::StrategyTemplate(TDEvent* tdevent)
 	this->tdevent = tdevent;
 	this->indn = new Indicators();
 	this->__tick = TickInfomation();
-	this->__tick.datetime = "19990101 00:00:00";
 }
 
 StrategyTemplate::~StrategyTemplate()

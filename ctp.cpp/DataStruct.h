@@ -10,6 +10,7 @@
 #include <Windows.h>
 #include <string>
 #include <thread>
+#include <mutex>
 #include <math.h>
 #include <rapidjson/istreamwrapper.h>
 #include <rapidjson/ostreamwrapper.h>
@@ -142,7 +143,7 @@ struct LoginInfo
 struct TickInfomation
 {
 	bool EMPTY = true;
-	string datetime;
+	char datetime[24];
 
 	///½»Ò×ÈÕ
 	TThostFtdcDateType	TradingDay;
