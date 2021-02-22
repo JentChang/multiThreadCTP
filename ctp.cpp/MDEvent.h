@@ -5,7 +5,6 @@
 #include "DataStruct.h"
 #include "StrategyTemplate.h"
 
-
 class MDEvent
 {
 public:
@@ -13,8 +12,6 @@ public:
 	~MDEvent();
 
 public:
-
-	void InsNum(int);
 	int AddTick(TickInfomation);
 
 	void AddStrategy(StrategyTemplate*);
@@ -25,11 +22,13 @@ private:
 	static void SendTickThreadFun(StrategyTemplate*);
 
 private:
-	static vector<TickInfomation> __tick_vtr;
+	static map<string, TickInfomation> __tick_map;
+
+	static bool ISWRITING;
+	static int ISREADING;
+
 	static vector<StrategyTemplate*> strategy_vtr;
 	vector<std::thread> thread_vtr;
-	static mutex mtx;
-
 };
 
 

@@ -244,13 +244,10 @@ int main(int argc, char* argv[]) {
 	insts[2] = "m2105";
 
 	int ret = mdapi->SubscribeMarketData(insts, 3);
-	mdevent->InsNum(3);
-
 
 	TDEvent* tdevent = new TDEvent(td);
 	///×¢²á²ßÂÔ
-	Indicators* indn = new Indicators();
-	StrategyTemplate* st = new StrategyTemplate(tdevent, indn);
+	StrategyTemplate* st = new StrategyTemplate(tdevent);
 	mdevent->AddStrategy(st);
 	mdevent->StrategyStart();
 
@@ -263,5 +260,12 @@ int main(int argc, char* argv[]) {
 
 	}
 
+	delete st;
+	delete insts;
+	delete tdevent;
+	delete td;
+	delete mdevent;
+	delete md;
+	
 	return 0;
 }

@@ -4,6 +4,8 @@
 #include "DataStruct.h"
 #include "Strategy_rb_rsi_1.h"
 
+#define INSTS_COUNT 3
+
 using namespace rapidjson;
 
 using namespace std;
@@ -73,8 +75,8 @@ int main(int argc, char* argv[]) {
 	insts[2] = "m2105";
 
 	int ret = mdapi->SubscribeMarketData(insts, 3);
-	mdevent->InsNum(3);
 
+	std::this_thread::sleep_for(std::chrono::seconds(10));
 
 	TDEvent* tdevent = new TDEvent(td);
 	///×¢²á²ßÂÔ

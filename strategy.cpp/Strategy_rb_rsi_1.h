@@ -20,7 +20,7 @@ public:
 	void OnBar(BarInfomation* bar);
 
 private:
-	
+	ofstream FILEW;
 
 
 };

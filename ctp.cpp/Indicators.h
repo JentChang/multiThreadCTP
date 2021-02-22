@@ -31,6 +31,7 @@ private:
 	double __i__ = 0;
 	double __j__ = 0;
 	bool __BS__ = true;
+	vector<string> time_strs;
 };
 
 #endif

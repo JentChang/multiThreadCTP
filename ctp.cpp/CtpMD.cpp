@@ -6,11 +6,14 @@ CtpMD::CtpMD(CThostFtdcMdApi* api, CThostFtdcReqUserLoginField* pUserLogin, MDEv
 	api(api), userLogin(pUserLogin), mdevent(mdevent)
 {
 	requestID = 1;
+	CtpMD::FILEW.open("E:\\IWORK\\CPPproject\\CTP\\CTP_Multi_Thread\\build\\data.json\\rb.csv");
+	CtpMD::FILEW.close();
 }
 
 
 CtpMD::~CtpMD()
 {
+
 	if (mdevent)
 	{
 		mdevent = nullptr;
@@ -184,6 +187,21 @@ void CtpMD::OnRtnDepthMarketData(CThostFtdcDepthMarketDataField* pDepthMarketDat
 	strcat(tick_info.datetime, mtime);
 
 	this->mdevent->AddTick(tick_info);
+	char* ins = "rb2105";
+	if (strcmp(tick_info.InstrumentID, ins) == 0)
+	{
+		CtpMD::FILEW.open("E:\\IWORK\\CPPproject\\CTP\\CTP_Multi_Thread\\build\\data.json\\rb.csv", ios::app);
+		CtpMD::FILEW << tick_info.datetime << " "
+			<< tick_info.InstrumentID << " "
+			<< tick_info.TradingDay << " "
+			<< tick_info.UpdateTime << " "
+			<< tick_info.UpdateMillisec << " "
+			<< endl;
+		CtpMD::FILEW.close();
+
+
+	}
+	
 
 	//std::cout << "OnRtnDepthMarketData,"
 	//	<< pDepthMarketData->InstrumentID << ","

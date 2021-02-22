@@ -28,7 +28,11 @@ void Indicators::make_bar(TickInfomation tick)
 	// ∫œ≥…kœﬂ
 	bool newMinitue = false;
 	Indicators::__barclose__ = false;
-	vector<string> time_strs = Split(bar_time, ":");
+	Indicators::time_strs = Split(bar_time, ":");
+	if (time_strs.size() < 2)
+	{
+		return;
+	}
 	if (Indicators::__bar__.EMPTY)
 	{
 		newMinitue = true;

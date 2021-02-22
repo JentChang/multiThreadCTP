@@ -56,6 +56,9 @@ private:
 	int requestID;
 
 	MDEvent* mdevent = nullptr;
+	ofstream FILEW;
+	
+
 };
 
 #endif 

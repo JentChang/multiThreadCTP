@@ -3,11 +3,6 @@
 #ifndef _CTPTD_H_
 #define _CTPTD_H_
 
-
-#include <iostream>
-#include <vector>
-#include <thread>
-
 #include "ThostFtdcTraderApi.h"
 
 #include "DataStruct.h"

@@ -9,6 +9,7 @@ StrategyTemplate::StrategyTemplate(TDEvent* tdevent)
 
 StrategyTemplate::~StrategyTemplate()
 {
+	delete this->indn;
 	this->__InstrumentID = nullptr;
 	this->indn = nullptr;
 }

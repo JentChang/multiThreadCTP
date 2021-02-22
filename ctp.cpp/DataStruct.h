@@ -1,11 +1,10 @@
 #pragma once
-
 #ifndef _DataStruct_H_
 #define _DataStruct_H_
 
 #include "ThostFtdcUserApiStruct.h"
 #include "ThostFtdcTraderApi.h"
-#include <vector>
+//#include <vector>
 #include <iostream>
 #include <Windows.h>
 #include <string>
@@ -19,6 +18,9 @@
 #include "rapidjson/document.h"
 #include "rapidjson/prettywriter.h"
 #include "rapidjson/stringbuffer.h"
+#include <queue>
+#include <map>
+
 
 
 using namespace std;
@@ -140,6 +142,7 @@ struct LoginInfo
 //	char	ActionDay[9];
 //};
 
+
 struct TickInfomation
 {
 	bool EMPTY = true;
@@ -233,7 +236,6 @@ struct TickInfomation
 	TThostFtdcPriceType	AveragePrice;
 	///业务日期
 	TThostFtdcDateType	ActionDay;
-
 };
 
 

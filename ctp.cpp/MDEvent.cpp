@@ -1,40 +1,37 @@
 #include "MDEvent.h"
 
+map<string, TickInfomation> MDEvent::__tick_map;
 
-vector<TickInfomation> MDEvent::__tick_vtr;
+bool MDEvent::ISWRITING;
+int MDEvent::ISREADING;
 vector<StrategyTemplate*> MDEvent::strategy_vtr;
-mutex MDEvent::mtx;
+
 
 MDEvent::MDEvent()
 {
-	this->__tick_vtr.clear();
+	MDEvent::ISWRITING = false;
+	MDEvent::ISREADING = false;
+
 	this->strategy_vtr.clear();
 	this->thread_vtr.clear();
 }
 
 MDEvent::~MDEvent()
 {
-	//for (size_t i = 0; i < strategy_vtr.size(); i++)
-	//{
-	//	this->strategy_vtr.at[i] = nullptr;
-	//}
 	this->strategy_vtr.clear();
 	this->thread_vtr.clear();
 }
 
-void MDEvent::InsNum(int ins_num)
-{
-	this->__tick_vtr.resize(ins_num+2);
-}
 
 int MDEvent::AddTick(TickInfomation tick)
 {
-	TickInfomation tick_info = tick;
-
-	MDEvent::mtx.lock();
-	this->__tick_vtr.push_back(tick_info);
-	this->__tick_vtr.erase(this->__tick_vtr.begin());
-	MDEvent::mtx.unlock();
+	while (MDEvent::ISREADING == 0)
+	{
+		///等待读线程复制结束
+	}
+	MDEvent::ISWRITING = true;
+	MDEvent::__tick_map[tick.InstrumentID] = tick;
+	MDEvent::ISWRITING = false;
 
 	return 0;
 }
@@ -66,21 +63,27 @@ void MDEvent::join()
 
 void MDEvent::SendTickThreadFun(StrategyTemplate* st)
 {
+	static TickInfomation tick;
+	static TThostFtdcInstrumentIDType thisthread_ins;
+	strcpy(thisthread_ins, st->InstrumentID());
+
 	while (true)
 	{
-		MDEvent::mtx.lock();
-		for (size_t i = 0; i < MDEvent::__tick_vtr.size(); i++)
+		while (MDEvent::ISWRITING)
 		{
-			TickInfomation tick = MDEvent::__tick_vtr.at(i);
-			if (!tick.EMPTY &&
-				strcmp(tick.datetime, st->GetTick().datetime) > 0 &&
-				strcmp(tick.InstrumentID, st->InstrumentID()) == 0
-				)
-			{
-				st->ReceiveTick(tick);
-			}
+			///等待写线程写结束
 		}
-		MDEvent::mtx.unlock();
+		MDEvent::ISREADING ++;
+		tick = MDEvent::__tick_map[thisthread_ins];
+		MDEvent::ISREADING --;
+
+		if (!tick.EMPTY &&
+			strcmp(tick.datetime, st->GetTick().datetime) > 0 &&
+			strcmp(tick.InstrumentID, st->InstrumentID()) == 0
+			)
+		{
+			st->ReceiveTick(tick);
+		}
+
 	}
-	
 }
