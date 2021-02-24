@@ -16,7 +16,6 @@ public:
 
 	void AddStrategy(StrategyTemplate*);
 	void StrategyStart();
-	void join();
 
 private:
 	static void SendTickThreadFun(StrategyTemplate*);

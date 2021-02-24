@@ -9,6 +9,10 @@ CtpTD::CtpTD(CThostFtdcTraderApi* api, CThostFtdcReqUserLoginField* pUserLogin) 
 	this->requestID = 1;
 	this->__onRtnTrade_vtr.clear();
 	this->__onRtnTrade_vtr.resize(500);
+
+	this->rtn_order = new CThostFtdcOrderField();
+	this-> rtn_position = new CThostFtdcInvestorPositionField();
+	this->rtn_acc = new CThostFtdcTradingAccountField();
 }
 
 
@@ -17,6 +21,9 @@ CtpTD::~CtpTD()
 	this->api = nullptr;
 	this->userLogin = nullptr;
 	this->userLogin_RSP = nullptr;
+	delete this->rtn_order;
+	delete this->rtn_position;
+	delete this->rtn_acc;
 }
 
 
@@ -235,52 +242,82 @@ void CtpTD::InLoginInfo(LoginInfo* login_info)
 	this->login_info = login_info;
 }
 
-int CtpTD::ReqOrderInsert(CThostFtdcInputOrderField order)
+CThostFtdcOrderField CtpTD::ReqOrderInsert(CThostFtdcInputOrderField order)
 {
+	CThostFtdcInputOrderField* order_insert = new CThostFtdcInputOrderField();
+	memset(order_insert, 0, sizeof(CThostFtdcInputOrderField));
+
+	//strcpy(order.InstrumentID, InstrumentID);
+
+	//order.Direction = THOST_FTDC_D_Buy;
+	//order.CombOffsetFlag[0] = THOST_FTDC_OF_Open;
+
+	order_insert->LimitPrice = order.LimitPrice;
+	order_insert->VolumeTotalOriginal = order.VolumeTotalOriginal;
+	strcpy(order_insert->InstrumentID, order.InstrumentID);
+	order_insert->Direction = order.Direction;
+	order_insert->CombOffsetFlag[0] = order.CombOffsetFlag[0];
+
 	///经纪公司代码
-	strcpy(order.BrokerID, this->login_info->BrokerID);
+	strcpy(order_insert->BrokerID, this->login_info->BrokerID);
 	///投资者代码
-	strcpy(order.InvestorID, this->login_info->UserID);
-	strcpy(order.UserID, this->login_info->UserID);
+	strcpy(order_insert->InvestorID, this->login_info->UserID);
+	strcpy(order_insert->UserID, this->login_info->UserID);
 	///报单引用
-	sprintf(order.OrderRef, "%d", this->requestID++);
+	sprintf(order_insert->OrderRef, "%d", this->requestID++);
 	///用户代码
 //	TThostFtdcUserIDType	UserID;
 	///报单价格条件: 限价
-	//req.OrderPriceType = THOST_FTDC_OPT_AnyPrice;
+	order_insert->OrderPriceType = THOST_FTDC_OPT_LimitPrice;
 
 	///组合投机套保标志
-	order.CombHedgeFlag[0] = THOST_FTDC_HF_Speculation;
+	order_insert->CombHedgeFlag[0] = THOST_FTDC_HF_Speculation;
 
 	///GTD日期
-//	TThostFtdcDateType	GTDDate;
+	//TThostFtdcDateType	GTDDate;
 
-	//req.VolumeCondition = THOST_FTDC_VC_CV;
+	///有效期类型: 当日有效
+	order_insert->TimeCondition = THOST_FTDC_TC_GFD;///IOC
+	///成交量类型: 任何数量
+	order_insert->VolumeCondition = THOST_FTDC_VC_AV;//CV
+	///最小成交量: 1
+	order_insert->MinVolume = 1;
+	///触发条件: 立即
+	order_insert->ContingentCondition = THOST_FTDC_CC_Immediately;
 
 	///止损价
-//	TThostFtdcPriceType	StopPrice;
+	//	TThostFtdcPriceType	StopPrice;
 	///强平原因: 非强平
-	order.ForceCloseReason = THOST_FTDC_FCC_NotForceClose;
+	order_insert->ForceCloseReason = THOST_FTDC_FCC_NotForceClose;
 	///自动挂起标志: 否
-	order.IsAutoSuspend = 0;
+	order_insert->IsAutoSuspend = 0;
 	///业务单元
 //	TThostFtdcBusinessUnitType	BusinessUnit;
 	///请求编号
 //	TThostFtdcRequestIDType	RequestID;
 	///用户强评标志: 否
-	order.UserForceClose = 0;
+	order_insert->UserForceClose = 0;
 
-	int iResult = this->api->ReqOrderInsert(&order, ++requestID);
+	memset(this->rtn_order, 0, sizeof(CThostFtdcOrderField));
+	this->rtn_order->RequestID = -1;
+	int iResult = this->api->ReqOrderInsert(order_insert, ++requestID);
+	delete order_insert;
+	std::cout << "order requestID: " << requestID - 1;
 	cerr << "--->>> 报单录入请求: " << ((iResult == 0) ? "成功" : "失败") << endl;
+	while (this->rtn_order->RequestID == -1)
+	{
+
+	}
+	std::cout << " order id : " << this->rtn_order->OrderSysID << endl;
 	if (iResult == 0)
 	{
-		return requestID;
+		return 	*this->rtn_order;
 	}
 	else
 	{
-		return -1;
+		this->rtn_order->RequestID = -1;
+		return *this->rtn_order;
 	}
-	
 }
 
 void CtpTD::OnRspOrderInsert(CThostFtdcInputOrderField *pInputOrder, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
@@ -309,223 +346,146 @@ void CtpTD::OnRspOrderInsert(CThostFtdcInputOrderField *pInputOrder, CThostFtdcR
 ///报单通知
 void CtpTD::OnRtnOrder(CThostFtdcOrderField *pOrder)
 {
-	/*
-	///经纪公司代码
-	TThostFtdcBrokerIDType BrokerID;
-	///投资者代码
-	TThostFtdcInvestorIDType InvestorID;
-	///合约代码
-	TThostFtdcInstrumentIDType InstrumentID;
-	///报单引用
-	TThostFtdcOrderRefType OrderRef;
-	///用户代码
-	TThostFtdcUserIDType UserID;
-	///报单价格条件
-	TThostFtdcOrderPriceTypeType OrderPriceType;
-	///买卖方向
-	TThostFtdcDirectionType Direction;
-	///组合开平标志
-	TThostFtdcCombOffsetFlagType CombOffsetFlag;
-	///组合投机套保标志
-	TThostFtdcCombHedgeFlagType CombHedgeFlag;
-	///价格
-	TThostFtdcPriceType LimitPrice;
-	///数量
-	TThostFtdcVolumeType VolumeTotalOriginal;
-	///有效期类型
-	TThostFtdcTimeConditionType TimeCondition;
-	///GTD日期
-	TThostFtdcDateType GTDDate;
-	///成交量类型
-	TThostFtdcVolumeConditionType VolumeCondition;
-	///最小成交量
-	TThostFtdcVolumeType MinVolume;
-	///触发条件
-	TThostFtdcContingentConditionType ContingentCondition;
-	///止损价
-	TThostFtdcPriceType StopPrice;
-	///强平原因
-	TThostFtdcForceCloseReasonType ForceCloseReason;
-	///自动挂起标志
-	TThostFtdcBoolType IsAutoSuspend;
-	///业务单元
-	TThostFtdcBusinessUnitType BusinessUnit;
-	///请求编号
-	TThostFtdcRequestIDType RequestID;
-	///本地报单编号
-	TThostFtdcOrderLocalIDType OrderLocalID;
-	///交易所代码
-	TThostFtdcExchangeIDType ExchangeID;
-	///会员代码
-	TThostFtdcParticipantIDType ParticipantID;
-	///客户代码
-	TThostFtdcClientIDType ClientID;
-	///合约在交易所的代码
-	TThostFtdcExchangeInstIDType ExchangeInstID;
-	///交易所交易员代码
-	TThostFtdcTraderIDType TraderID;
-	///安装编号
-	TThostFtdcInstallIDType InstallID;
-	///报单提交状态
-	TThostFtdcOrderSubmitStatusType OrderSubmitStatus;
-	///报单提示序号
-	TThostFtdcSequenceNoType NotifySequence;
-	///交易日
-	TThostFtdcDateType TradingDay;
-	///结算编号
-	TThostFtdcSettlementIDType SettlementID;
-	///报单编号
-	TThostFtdcOrderSysIDType OrderSysID;
-	///报单来源
-	TThostFtdcOrderSourceType OrderSource;
-	///报单状态
-	TThostFtdcOrderStatusType OrderStatus;
-	///报单类型
-	TThostFtdcOrderTypeType OrderType;
-	///今成交数量
-	TThostFtdcVolumeType VolumeTraded;
-	///剩余数量
-	TThostFtdcVolumeType VolumeTotal;
-	///报单日期
-	TThostFtdcDateType InsertDate;
-	///委托时间
-	TThostFtdcTimeType InsertTime;
-	///激活时间
-	TThostFtdcTimeType ActiveTime;
-	///挂起时间
-	TThostFtdcTimeType SuspendTime;
-	///最后修改时间
-	TThostFtdcTimeType UpdateTime;
-	///撤销时间
-	TThostFtdcTimeType CancelTime;
-	///最后修改交易所交易员代码
-	TThostFtdcTraderIDType ActiveTraderID;
-	///结算会员编号
-	TThostFtdcParticipantIDType ClearingPartID;
-	///序号
-	TThostFtdcSequenceNoType SequenceNo;
-	///前置编号
-	TThostFtdcFrontIDType FrontID;
-	///会话编号
-	TThostFtdcSessionIDType SessionID;
-	///用户端产品信息
-	TThostFtdcProductInfoType UserProductInfo;
-	///状态信息
-	TThostFtdcErrorMsgType StatusMsg;
-	///用户强评标志
-	TThostFtdcBoolType UserForceClose;
-	///操作用户代码
-	TThostFtdcUserIDType ActiveUserID;
-	///经纪公司报单编号
-	TThostFtdcSequenceNoType BrokerOrderSeq;
-	///相关报单
-	TThostFtdcOrderSysIDType RelativeOrderSysID;
-	///郑商所成交数量
-	TThostFtdcVolumeType ZCETotalTradedVolume;
-	///互换单标志
-	TThostFtdcBoolType IsSwapOrder;
-	///营业部编号
-	TThostFtdcBranchIDType BranchID;
-	///投资单元代码
-	TThostFtdcInvestUnitIDType InvestUnitID;
-	///资金账号
-	TThostFtdcAccountIDType AccountID;
-	///币种代码
-	TThostFtdcCurrencyIDType CurrencyID;
-	///IP地址
-	TThostFtdcIPAddressType IPAddress;
-	///Mac地址
-	TThostFtdcMacAddressType MacAddress;
-*/
+	memcpy(this->rtn_order, pOrder, sizeof(CThostFtdcOrderField));
 }
 
 void CtpTD::OnRtnTrade(CThostFtdcTradeField * pTrade)
 {
 	this->__onRtnTrade_vtr.push_back(*pTrade);
 	this->__onRtnTrade_vtr.erase(this->__onRtnTrade_vtr.begin());
-	//FrontID + SessionID + OrderRef
-		/////经纪公司代码
-		//TThostFtdcBrokerIDType	BrokerID;
-		/////投资者代码
-		//TThostFtdcInvestorIDType	InvestorID;
-		/////合约代码
-		//TThostFtdcInstrumentIDType	InstrumentID;
-	/////报单引用
-	//TThostFtdcOrderRefType	OrderRef;
-		/////用户代码
-		//TThostFtdcUserIDType	UserID;
-		/////交易所代码
-		//TThostFtdcExchangeIDType	ExchangeID;
-		/////成交编号
-		//TThostFtdcTradeIDType	TradeID;
-		/////买卖方向
-		//TThostFtdcDirectionType	Direction;
-	/////报单编号
-	//TThostFtdcOrderSysIDType	OrderSysID;
-		/////会员代码
-		//TThostFtdcParticipantIDType	ParticipantID;
-		/////客户代码
-		//TThostFtdcClientIDType	ClientID;
-		/////交易角色
-		//TThostFtdcTradingRoleType	TradingRole;
-		/////合约在交易所的代码
-		//TThostFtdcExchangeInstIDType	ExchangeInstID;
-		/////开平标志
-		//TThostFtdcOffsetFlagType	OffsetFlag;
-		/////投机套保标志
-		//TThostFtdcHedgeFlagType	HedgeFlag;
-		/////价格
-		//TThostFtdcPriceType	Price;
-		/////数量
-		//TThostFtdcVolumeType	Volume;
-		/////成交时期
-		//TThostFtdcDateType	TradeDate;
-		/////成交时间
-		//TThostFtdcTimeType	TradeTime;
-		/////成交类型
-		//TThostFtdcTradeTypeType	TradeType;
-		/////成交价来源
-		//TThostFtdcPriceSourceType	PriceSource;
-		/////交易所交易员代码
-		//TThostFtdcTraderIDType	TraderID;
-		/////本地报单编号
-		//TThostFtdcOrderLocalIDType	OrderLocalID;
-		/////结算会员编号
-		//TThostFtdcParticipantIDType	ClearingPartID;
-		/////业务单元
-		//TThostFtdcBusinessUnitType	BusinessUnit;
-		/////序号
-		//TThostFtdcSequenceNoType	SequenceNo;
-		/////交易日
-		//TThostFtdcDateType	TradingDay;
-		/////结算编号
-		//TThostFtdcSettlementIDType	SettlementID;
-		/////经纪公司报单编号
-		//TThostFtdcSequenceNoType	BrokerOrderSeq;
-		/////成交来源
-		//TThostFtdcTradeSourceType	TradeSource;
-		/////投资单元代码
-		//TThostFtdcInvestUnitIDType	InvestUnitID;
+}
 
+void CtpTD::OnRspQryInvestorPosition(CThostFtdcInvestorPositionField * pInvestorPosition, CThostFtdcRspInfoField * pRspInfo, int nRequestID, bool bIsLast)
+{
+	if (nullptr == pRspInfo || 0 == pRspInfo->ErrorID)
+	{
+		if (bIsLast || pInvestorPosition == nullptr)
+		{
+			this->rtn_position->Position = -1;
+		}
+		else {
+			
+			memcpy(this->rtn_position, pInvestorPosition, sizeof(CThostFtdcInvestorPositionField));
+		}
+	}
+	else {
+		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_INTENSITY | FOREGROUND_RED);
+		std::cout << "OnRspQryTradingAccount error:"
+			<< pRspInfo->ErrorID
+			<< pRspInfo->ErrorMsg
+			<< std::endl;
+		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_INTENSITY);
+	}
+}
+
+void CtpTD::OnRspQryTradingAccount(CThostFtdcTradingAccountField * pTradingAccount, CThostFtdcRspInfoField * pRspInfo, int nRequestID, bool bIsLast)
+{
+	if (nullptr == pRspInfo || 0 == pRspInfo->ErrorID)
+	{
+		if (bIsLast || pTradingAccount == nullptr)
+		{
+			strcpy(this->rtn_acc->TradingDay, "111");
+		}
+		else {
+			memcpy(this->rtn_acc, pTradingAccount, sizeof(CThostFtdcTradingAccountField));
+		}
+	}
+	else {
+		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_INTENSITY | FOREGROUND_RED);
+		std::cout << "OnRspQryTradingAccount error:"
+			<< pRspInfo->ErrorID
+			<< pRspInfo->ErrorMsg
+			<< std::endl;
+		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_INTENSITY);
+	}
 }
 
 int CtpTD::ReqOrderAction(CThostFtdcInputOrderActionField pInputOrderAction)
 {
-	this->requestID++;
 	///经纪公司代码
 	strcpy(pInputOrderAction.BrokerID, this->login_info->BrokerID);
 	///投资者代码
 	strcpy(pInputOrderAction.InvestorID, this->login_info->UserID);
 	strcpy(pInputOrderAction.UserID, this->login_info->UserID);
-	///报单操作引用
-	pInputOrderAction.OrderActionRef = this->requestID;
 	///前置编号
 	pInputOrderAction.FrontID = this->userLogin_RSP->FrontID;
 	///会话编号
 	pInputOrderAction.SessionID = this->userLogin_RSP->SessionID;
 
+	pInputOrderAction.ActionFlag = THOST_FTDC_AF_Delete;
+	int iResult = this->api->ReqOrderAction(&pInputOrderAction, this->requestID++);
+	std::cout << "action order requestID: " << requestID;
+	cerr << "--->>> 撤单录入请求: " << ((iResult == 0) ? "成功" : "失败") << endl;
+	if (iResult == 0)
+	{
+		return requestID;
+	}
+	else
+	{
+		return -1;
+	}
+}
 
-	return requestID;
+CThostFtdcInvestorPositionField CtpTD::ReqQryInvestorPosition(CThostFtdcQryInvestorPositionField pQryInvestorPosition)
+{
+	///交易所代码
+	///合约代码
+	///经纪公司代码
+	strcpy(pQryInvestorPosition.BrokerID, this->login_info->BrokerID);
+	///投资者代码
+	strcpy(pQryInvestorPosition.InvestorID, this->login_info->UserID);
+
+
+	memset(this->rtn_position, 0, sizeof(CThostFtdcInvestorPositionField));
+	this->rtn_position->Position = -1;
+	int iResult = this->api->ReqQryInvestorPosition(&pQryInvestorPosition, requestID++);
+	cerr << "--->>> 查询持仓请求: " << ((iResult == 0) ? "成功" : "失败") << endl;
+
+	while (this->rtn_position->Position == -1)
+	{
+
+	}
+	if (iResult == 0)
+	{
+		return 	*this->rtn_position;
+	}
+	else
+	{
+		this->rtn_position->Position = -1;
+		return *this->rtn_position;
+	}
+}
+
+CThostFtdcTradingAccountField CtpTD::ReqQryTradingAccount()
+{
+	CThostFtdcQryTradingAccountField pQryTradingAccount;
+	memset(&pQryTradingAccount, 0, sizeof(CThostFtdcQryTradingAccountField));
+
+	///经纪公司代码
+	strcpy(pQryTradingAccount.BrokerID, this->login_info->BrokerID);
+	///投资者代码
+	strcpy(pQryTradingAccount.InvestorID, this->login_info->UserID);
+	///投资者帐号
+	strcpy(pQryTradingAccount.AccountID, this->login_info->UserID);
+
+	memset(this->rtn_acc, 0, sizeof(CThostFtdcTradingAccountField));
+	strcpy(this->rtn_acc->TradingDay, "111");
+	int iResult = this->api->ReqQryTradingAccount(&pQryTradingAccount, requestID++);
+	cerr << "--->>> 查询资金请求: " << ((iResult == 0) ? "成功" : "失败") << endl;
+	while (strcmp(this->rtn_acc->TradingDay, "111") == 0)
+	{
+
+	}
+	if (iResult == 0)
+	{
+		return 	*this->rtn_acc;
+	}
+	else
+	{
+		strcpy(this->rtn_acc->TradingDay, "111");
+		return *this->rtn_acc;
+	}
+
 }
 
 vector<CThostFtdcTradeField>* CtpTD::OnRtnTradeVtr()

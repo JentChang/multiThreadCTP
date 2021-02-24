@@ -54,12 +54,6 @@ void MDEvent::StrategyStart()
 	}
 }
 
-void MDEvent::join()
-{
-	for (auto& thread : this->thread_vtr) {
-		thread.join();
-	}
-}
 
 void MDEvent::SendTickThreadFun(StrategyTemplate* st)
 {

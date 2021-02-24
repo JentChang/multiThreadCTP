@@ -3,7 +3,6 @@
 #define _DataStruct_H_
 
 #include "ThostFtdcUserApiStruct.h"
-#include "ThostFtdcTraderApi.h"
 //#include <vector>
 #include <iostream>
 #include <Windows.h>
@@ -50,95 +49,95 @@ struct LoginInfo
 //struct TickInfomation
 //{
 //	bool EMPTY = true;
-//	string datetime;
+//	char datetime[24];
 //
-//	///交易日
+//	交易日
 //	char	TradingDay[9];
-//	///合约代码
+//	合约代码
 //	char	InstrumentID[31];
-//	///交易所代码
+//	交易所代码
 //	char	ExchangeID[9];
-//	///合约在交易所的代码
+//	合约在交易所的代码
 //	char	ExchangeInstID[31];
-//	///最新价
+//	最新价
 //	double	LastPrice;
-//	///上次结算价
+//	上次结算价
 //	double	PreSettlementPrice;
-//	///昨收盘
+//	昨收盘
 //	double	PreClosePrice;
-//	///昨持仓量
+//	昨持仓量
 //	double	PreOpenInterest;
-//	///今开盘
+//	今开盘
 //	double	OpenPrice;
-//	///最高价
+//	最高价
 //	double	HighestPrice;
-//	///最低价
+//	最低价
 //	double	LowestPrice;
-//	///数量
+//	数量
 //	int	Volume;
-//	///成交金额
+//	成交金额
 //	double	Turnover;
-//	///持仓量
+//	持仓量
 //	double	OpenInterest;
-//	///今收盘
+//	今收盘
 //	double	ClosePrice;
-//	///本次结算价
+//	本次结算价
 //	double	SettlementPrice;
-//	///涨停板价
+//	涨停板价
 //	double	UpperLimitPrice;
-//	///跌停板价
+//	跌停板价
 //	double	LowerLimitPrice;
-//	///昨虚实度
+//	昨虚实度
 //	double	PreDelta;
-//	///今虚实度
+//	今虚实度
 //	double	CurrDelta;
-//	///最后修改时间
+//	最后修改时间
 //	char	UpdateTime[9];
-//	///最后修改毫秒
+//	最后修改毫秒
 //	int	UpdateMillisec;
-//	///申买价一
+//	申买价一
 //	double	BidPrice1;
-//	///申买量一
+//	申买量一
 //	int	BidVolume1;
-//	///申卖价一
+//	申卖价一
 //	double	AskPrice1;
-//	///申卖量一
+//	申卖量一
 //	int	AskVolume1;
-//	///申买价二
+//	申买价二
 //	double	BidPrice2;
-//	///申买量二
+//	申买量二
 //	int	BidVolume2;
-//	///申卖价二
+//	申卖价二
 //	double	AskPrice2;
-//	///申卖量二
+//	申卖量二
 //	int	AskVolume2;
-//	///申买价三
+//	申买价三
 //	double	BidPrice3;
-//	///申买量三
+//	申买量三
 //	int	BidVolume3;
-//	///申卖价三
+//	申卖价三
 //	double	AskPrice3;
-//	///申卖量三
+//	申卖量三
 //	int	AskVolume3;
-//	///申买价四
+//	申买价四
 //	double	BidPrice4;
-//	///申买量四
+//	申买量四
 //	int	BidVolume4;
-//	///申卖价四
+//	申卖价四
 //	double	AskPrice4;
-//	///申卖量四
+//	申卖量四
 //	int	AskVolume4;
-//	///申买价五
+//	申买价五
 //	double	BidPrice5;
-//	///申买量五
+//	申买量五
 //	int	BidVolume5;
-//	///申卖价五
+//	申卖价五
 //	double	AskPrice5;
-//	///申卖量五
+//	申卖量五
 //	int	AskVolume5;
-//	///当日均价
+//	当日均价
 //	double	AveragePrice;
-//	///业务日期
+//	业务日期
 //	char	ActionDay[9];
 //};
 

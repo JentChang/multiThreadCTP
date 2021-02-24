@@ -71,25 +71,33 @@ public:
 		return instruments;
 	}
 
-	///报单录入请求
-	int ReqOrderInsert(CThostFtdcInputOrderField);
+	
 
 	virtual void OnRspOrderInsert(CThostFtdcInputOrderField *pInputOrder, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 
 	///报单通知
 	virtual void OnRtnOrder(CThostFtdcOrderField *pOrder);
-
 	///成交通知
 	virtual void OnRtnTrade(CThostFtdcTradeField *pTrade);
+	///持仓通知
+	virtual void OnRspQryInvestorPosition(CThostFtdcInvestorPositionField *pInvestorPosition, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
+	///资金通知
+	virtual void OnRspQryTradingAccount(CThostFtdcTradingAccountField *pTradingAccount, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast);
 
+
+	///REQ
+	///报单录入请求
+	CThostFtdcOrderField ReqOrderInsert(CThostFtdcInputOrderField);
 	///撤单
 	int ReqOrderAction(CThostFtdcInputOrderActionField pInputOrderAction);
+	///查询持仓
+	CThostFtdcInvestorPositionField ReqQryInvestorPosition(CThostFtdcQryInvestorPositionField pQryInvestorPosition);
+	CThostFtdcTradingAccountField ReqQryTradingAccount();
 
-	///成交回报
 	vector<CThostFtdcTradeField>* OnRtnTradeVtr();
 
 private:
-	
+
 
 private:
 	CThostFtdcTraderApi* api = nullptr;
@@ -99,6 +107,9 @@ private:
 	int requestID;
 	std::string tradingDate;
 	std::vector<CThostFtdcInstrumentField> instruments;
+	CThostFtdcOrderField *rtn_order;
+	CThostFtdcInvestorPositionField* rtn_position;
+	CThostFtdcTradingAccountField* rtn_acc;
 
 	LoginInfo* login_info;
 

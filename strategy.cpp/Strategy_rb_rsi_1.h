@@ -22,6 +22,8 @@ public:
 private:
 	ofstream FILEW;
 
+	bool istest = true;
+
 
 };
 

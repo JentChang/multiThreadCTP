@@ -13,16 +13,21 @@ public:
 	~TDEvent();
 
 public:
-	int LONG(TThostFtdcPriceType price, TThostFtdcVolumeType volume, TThostFtdcInstrumentIDType InstrumentID);
-	int SHORT(TThostFtdcPriceType price, TThostFtdcVolumeType volume, TThostFtdcInstrumentIDType InstrumentID);
-	int SELL(TThostFtdcPriceType price, TThostFtdcVolumeType volume, TThostFtdcInstrumentIDType InstrumentID, bool today=false);
-	int COVER(TThostFtdcPriceType price, TThostFtdcVolumeType volume, TThostFtdcInstrumentIDType InstrumentID, bool today=false);
-	int ACTION(int OrderRef, TThostFtdcExchangeIDType ExchangeID, TThostFtdcInstrumentIDType InstrumentID);
+	CThostFtdcOrderField LONG(TThostFtdcPriceType price, TThostFtdcVolumeType volume, TThostFtdcInstrumentIDType InstrumentID);
+	CThostFtdcOrderField SHORT(TThostFtdcPriceType price, TThostFtdcVolumeType volume, TThostFtdcInstrumentIDType InstrumentID);
+	CThostFtdcOrderField SELL(TThostFtdcPriceType price, TThostFtdcVolumeType volume, TThostFtdcInstrumentIDType InstrumentID, bool today=false);
+	CThostFtdcOrderField COVER(TThostFtdcPriceType price, TThostFtdcVolumeType volume, TThostFtdcInstrumentIDType InstrumentID, bool today=false);
+	int ACTION(TThostFtdcOrderSysIDType sys_id, TThostFtdcExchangeIDType ExchangeID, TThostFtdcInstrumentIDType InstrumentID);
+
+	///查询持仓
+	CThostFtdcInvestorPositionField Postion(TThostFtdcExchangeIDType ExchangeID, TThostFtdcInstrumentIDType InstrumentID);
+	///查询账户资金
+	CThostFtdcTradingAccountField Account();
 
 	
 private:
-	int SendOrder(CThostFtdcInputOrderField order);
-	static int ActionOrderThread(int time, TThostFtdcExchangeIDType ExchangeID, TThostFtdcInstrumentIDType InstrumentID);
+	CThostFtdcOrderField SendOrder(CThostFtdcInputOrderField order);
+	//static void ActionOrderThread(int mtime, TThostFtdcExchangeIDType ExchangeID, TThostFtdcInstrumentIDType InstrumentID);
 	static vector<CThostFtdcTradeField>* receiveTrade();
 
 private:
@@ -30,9 +35,12 @@ private:
 	static CtpTD* td;
 
 private:
-	static bool __order_online;
 	vector<CThostFtdcTradeField> __order_trade;
-	static int __order_ref;
+	static mutex sys_id_mutex;
+	//static vector<TThostFtdcOrderSysIDType> sys_id_vtr;
+	//static map<TThostFtdcOrderSysIDType, int> sys_id_time_map;
+
+	static mutex td_global_mutex;
 };
 
 #endif

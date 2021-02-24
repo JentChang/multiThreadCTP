@@ -71,22 +71,26 @@ void StrategyTemplate::FunEnd()
 
 
 
-int StrategyTemplate::LONG(TThostFtdcPriceType price, TThostFtdcVolumeType volume, TThostFtdcInstrumentIDType InstrumentID)
+
+CThostFtdcOrderField StrategyTemplate::LONG(TThostFtdcPriceType price, TThostFtdcVolumeType volume, TThostFtdcInstrumentIDType InstrumentID)
 {
 	return this->tdevent->LONG(price, volume, InstrumentID);
 }
 
-int StrategyTemplate::SELL(TThostFtdcPriceType price, TThostFtdcVolumeType volume, TThostFtdcInstrumentIDType InstrumentID)
+
+CThostFtdcOrderField StrategyTemplate::SELL(TThostFtdcPriceType price, TThostFtdcVolumeType volume, TThostFtdcInstrumentIDType InstrumentID)
 {
 	return this->tdevent->SELL(price, volume, InstrumentID);
 }
 
-int StrategyTemplate::SHORT(TThostFtdcPriceType price, TThostFtdcVolumeType volume, TThostFtdcInstrumentIDType InstrumentID)
+
+CThostFtdcOrderField StrategyTemplate::SHORT(TThostFtdcPriceType price, TThostFtdcVolumeType volume, TThostFtdcInstrumentIDType InstrumentID)
 {
 	return this->tdevent->SHORT(price, volume, InstrumentID);
 }
 
-int StrategyTemplate::COVER(TThostFtdcPriceType price, TThostFtdcVolumeType volume, TThostFtdcInstrumentIDType InstrumentID)
+
+CThostFtdcOrderField StrategyTemplate::COVER(TThostFtdcPriceType price, TThostFtdcVolumeType volume, TThostFtdcInstrumentIDType InstrumentID)
 {
 	return this->tdevent->COVER(price, volume, InstrumentID);
 }

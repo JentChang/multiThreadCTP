@@ -2,13 +2,15 @@
 
 
 CtpTD* TDEvent::td;
-bool TDEvent::__order_online;
-int TDEvent::__order_ref;
+//vector<TThostFtdcOrderSysIDType> TDEvent::sys_id_vtr;
+//map<TThostFtdcOrderSysIDType, int> TDEvent::sys_id_time_map;
+mutex TDEvent::sys_id_mutex;
+mutex TDEvent::td_global_mutex;
+
 
 TDEvent::TDEvent(CtpTD* td)
 {
 	TDEvent::td = td;
-	this->__order_online = false;
 }
 
 TDEvent::~TDEvent()
@@ -16,10 +18,11 @@ TDEvent::~TDEvent()
 	this->td = nullptr;
 }
 
-int TDEvent::LONG(TThostFtdcPriceType price, TThostFtdcVolumeType volume, TThostFtdcInstrumentIDType InstrumentID)
+CThostFtdcOrderField TDEvent::LONG(TThostFtdcPriceType price, TThostFtdcVolumeType volume, TThostFtdcInstrumentIDType InstrumentID)
 {
-	this->__order_online = true;
 	CThostFtdcInputOrderField order;
+	memset(&order, 0, sizeof(CThostFtdcInputOrderField));
+
 	order.LimitPrice = price;
 	order.VolumeTotalOriginal = volume;
 	strcpy(order.InstrumentID, InstrumentID);
@@ -30,10 +33,11 @@ int TDEvent::LONG(TThostFtdcPriceType price, TThostFtdcVolumeType volume, TThost
 	return this->SendOrder(order);
 }
 
-int TDEvent::SHORT(TThostFtdcPriceType price, TThostFtdcVolumeType volume, TThostFtdcInstrumentIDType InstrumentID)
+CThostFtdcOrderField TDEvent::SHORT(TThostFtdcPriceType price, TThostFtdcVolumeType volume, TThostFtdcInstrumentIDType InstrumentID)
 {
-	this->__order_online = true;
 	CThostFtdcInputOrderField order;
+	memset(&order, 0, sizeof(CThostFtdcInputOrderField));
+	
 	order.LimitPrice = price;
 	order.VolumeTotalOriginal = volume;
 	strcpy(order.InstrumentID, InstrumentID);
@@ -44,10 +48,11 @@ int TDEvent::SHORT(TThostFtdcPriceType price, TThostFtdcVolumeType volume, TThos
 	return this->SendOrder(order);
 }
 
-int TDEvent::SELL(TThostFtdcPriceType price, TThostFtdcVolumeType volume, TThostFtdcInstrumentIDType InstrumentID, bool today)
+CThostFtdcOrderField TDEvent::SELL(TThostFtdcPriceType price, TThostFtdcVolumeType volume, TThostFtdcInstrumentIDType InstrumentID, bool today)
 {
-	this->__order_online = true;
 	CThostFtdcInputOrderField order;
+	memset(&order, 0, sizeof(CThostFtdcInputOrderField));
+
 	order.LimitPrice = price;
 	order.VolumeTotalOriginal = volume;
 	strcpy(order.InstrumentID, InstrumentID);
@@ -64,10 +69,10 @@ int TDEvent::SELL(TThostFtdcPriceType price, TThostFtdcVolumeType volume, TThost
 	return this->SendOrder(order);
 }
 
-int TDEvent::COVER(TThostFtdcPriceType price, TThostFtdcVolumeType volume, TThostFtdcInstrumentIDType InstrumentID, bool today)
+CThostFtdcOrderField TDEvent::COVER(TThostFtdcPriceType price, TThostFtdcVolumeType volume, TThostFtdcInstrumentIDType InstrumentID, bool today)
 {
-	this->__order_online = true;
 	CThostFtdcInputOrderField order;
+	memset(&order, 0, sizeof(CThostFtdcInputOrderField));
 	order.LimitPrice = price;
 	order.VolumeTotalOriginal = volume;
 	strcpy(order.InstrumentID, InstrumentID);
@@ -84,52 +89,84 @@ int TDEvent::COVER(TThostFtdcPriceType price, TThostFtdcVolumeType volume, TThos
 	return this->SendOrder(order);
 }
 
-int TDEvent::ACTION(int OrderRef, TThostFtdcExchangeIDType ExchangeID, TThostFtdcInstrumentIDType InstrumentID)
+int TDEvent::ACTION(TThostFtdcOrderSysIDType sys_id, TThostFtdcExchangeIDType ExchangeID, TThostFtdcInstrumentIDType InstrumentID)
 {
 	CThostFtdcInputOrderActionField pInputOrderAction;
+	memset(&pInputOrderAction, 0, sizeof(CThostFtdcInputOrderActionField));
 	///OrderSysID FrontID+SessionID+OrderRef
-	sprintf(pInputOrderAction.OrderRef, "%d", OrderRef);
 	strcpy(pInputOrderAction.ExchangeID, ExchangeID);
 	strcpy(pInputOrderAction.InstrumentID, InstrumentID);
-	this->__order_ref = 0;
-	this->__order_online = false;
+	strcpy_s(pInputOrderAction.OrderSysID, sys_id);
+
 	return TDEvent::td->ReqOrderAction(pInputOrderAction);;
 }
 
-int TDEvent::SendOrder(CThostFtdcInputOrderField order)
+CThostFtdcInvestorPositionField TDEvent::Postion(TThostFtdcExchangeIDType ExchangeID, TThostFtdcInstrumentIDType InstrumentID)
 {
-	this->__order_online = true;
-	this -> __order_ref = TDEvent::td->ReqOrderInsert(order);
+	TDEvent::td_global_mutex.lock();
 
-	return this->__order_ref;
+	CThostFtdcQryInvestorPositionField pQryInvestorPosition;
+	memset(&pQryInvestorPosition, 0, sizeof(CThostFtdcQryInvestorPositionField));
+
+	strcpy(pQryInvestorPosition.ExchangeID, ExchangeID);
+	strcpy(pQryInvestorPosition.ExchangeID, InstrumentID);
+
+	CThostFtdcInvestorPositionField rtn_pos = TDEvent::td->ReqQryInvestorPosition(pQryInvestorPosition);
+	TDEvent::td_global_mutex.lock();
+	return rtn_pos;
 }
 
-int TDEvent::ActionOrderThread(int time, TThostFtdcExchangeIDType ExchangeID, TThostFtdcInstrumentIDType InstrumentID)
+CThostFtdcTradingAccountField TDEvent::Account()
 {
-	TThostFtdcOrderRefType ref;
-	sprintf(ref, "%d", TDEvent::__order_ref);
-	vector<CThostFtdcTradeField>* onRtnTradeVtr = TDEvent::receiveTrade();
-
-	Sleep(time);
-	//for (size_t i = 0; i < onRtnTradeVtr->size(); i++)
-	//{
-	//	CThostFtdcTradeField onRtnTrade = onRtnTradeVtr->at[i];
-	//	
-	//	if (strcmp(onRtnTrade.OrderRef, ref) == 0)
-	//	{
-	//		onRtnTradeVtr->erase(onRtnTradeVtr->at[i]);
-	//		return 0;
-	//	}
-	//}
-
-	CThostFtdcInputOrderActionField pInputOrderAction;
-	sprintf(pInputOrderAction.OrderRef, "%d", ref);
-	strcpy(pInputOrderAction.ExchangeID, ExchangeID);
-	strcpy(pInputOrderAction.InstrumentID, InstrumentID);
-	TDEvent::__order_ref = 0;
-	TDEvent::__order_online = false;
-	return TDEvent::td->ReqOrderAction(pInputOrderAction);
+	TDEvent::td_global_mutex.lock();
+	CThostFtdcTradingAccountField rtn_acc = TDEvent::td->ReqQryTradingAccount();
+	TDEvent::td_global_mutex.lock();
+	return rtn_acc;
 }
+
+CThostFtdcOrderField TDEvent::SendOrder(CThostFtdcInputOrderField order)
+{
+	TDEvent::td_global_mutex.lock();
+	CThostFtdcOrderField rtn_order;
+	rtn_order = TDEvent::td->ReqOrderInsert(order);
+	//TDEvent::sys_id_mutex.lock();
+	//this->sys_id_vtr.push_back(rtn_order.OrderSysID);
+	//this->sys_id_time_map[rtn_order.OrderSysID] = GetTickCount();
+	//TDEvent::sys_id_mutex.unlock();
+	TDEvent::td_global_mutex.unlock();
+	return rtn_order;
+}
+
+
+
+//void TDEvent::ActionOrderThread(int mtime, TThostFtdcExchangeIDType ExchangeID, TThostFtdcInstrumentIDType InstrumentID)
+//{
+//	while (true)
+//	{
+//		TDEvent::sys_id_mutex.lock();
+//		if (TDEvent::sys_id_vtr.size() == 0)
+//		{
+//			continue;
+//		}
+//		if (GetTickCount() - TDEvent::sys_id_time_map[TDEvent::sys_id_vtr[0]])
+//		{
+//			CThostFtdcInputOrderActionField pInputOrderAction;
+//			memset(&pInputOrderAction, 0, sizeof(CThostFtdcInputOrderActionField));
+//			strcpy(pInputOrderAction.ExchangeID, ExchangeID);
+//			strcpy(pInputOrderAction.InstrumentID, InstrumentID);
+//			strcpy_s(pInputOrderAction.OrderSysID, TDEvent::sys_id_vtr[0]);
+//			TDEvent::td->ReqOrderAction(pInputOrderAction);
+//			
+//			map<TThostFtdcOrderSysIDType, int>::iterator key = TDEvent::sys_id_time_map.find(TDEvent::sys_id_vtr[0]);
+//			if (key != TDEvent::sys_id_time_map.end())
+//			{
+//				TDEvent::sys_id_time_map.erase(key);
+//			}
+//			TDEvent::sys_id_vtr.erase(TDEvent::sys_id_vtr.begin());
+//		}
+//		TDEvent::sys_id_mutex.unlock();
+//	}
+//}
 
 
 vector<CThostFtdcTradeField>* TDEvent::receiveTrade()
