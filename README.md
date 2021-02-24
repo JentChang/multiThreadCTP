@@ -1,12 +1,14 @@
 # 多线程的ctp 
 
+###依赖环境
 vs2017
 
 cmake 3.19
 
 git subtree add --prefix=lib/rapidjson   https://github.com/Tencent/rapidjson.git      v1.1.0   --squash
 
-
+##使用
+在 build/data.json/ctp_config/ctp_config.json 中设置你的账户信息
 ### 添加策略
 
 * step1
@@ -33,5 +35,10 @@ git subtree add --prefix=lib/rapidjson   https://github.com/Tencent/rapidjson.gi
 	
 	`StrategyTemplate* st = new Strategy_rb_rsi(tdevent);`
 	`mdevent->AddStrategy(st)`
+
+-------------
+
+vs中编译，设置cpp为启动项目 bebug/release x64运行
+
 	
 
