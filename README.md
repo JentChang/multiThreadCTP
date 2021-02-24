@@ -15,17 +15,18 @@ git subtree add --prefix=lib/rapidjson   https://github.com/Tencent/rapidjson.gi
 
 	strategy.cpp文件夹内创建文件
 	
-	命名Strategy_XXXXX.h Strategy_XXXXX.cpp（拷贝例子更改）
+	命名Strategy_XXXXX.h Strategy_XXXXX.cpp（可以拷贝例子更改， XXXXX为任意符合变量命名规范的符号）
 
 * step2
 
 	built 执行cmake
+	(built文件内有对应的bat文件，可以打开查看cmake的具体命令，可以直接执行，建议在build下启动cmd，执行cmake命令)
 	
 * step3
 
 	vs打开工程 在strategy_cpp中
 	
-	Strategy_XXXXX.cpp ReceiveTick or OnBar中实现自己的策略
+	Strategy_XXXXX.cpp 在函数ReceiveTick中实现自己的策略
 
 * step4
 
