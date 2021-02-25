@@ -91,14 +91,16 @@ CThostFtdcOrderField TDEvent::COVER(TThostFtdcPriceType price, TThostFtdcVolumeT
 
 int TDEvent::ACTION(TThostFtdcOrderSysIDType sys_id, TThostFtdcExchangeIDType ExchangeID, TThostFtdcInstrumentIDType InstrumentID)
 {
+	TDEvent::td_global_mutex.lock();
 	CThostFtdcInputOrderActionField pInputOrderAction;
 	memset(&pInputOrderAction, 0, sizeof(CThostFtdcInputOrderActionField));
 	///OrderSysID FrontID+SessionID+OrderRef
 	strcpy(pInputOrderAction.ExchangeID, ExchangeID);
 	strcpy(pInputOrderAction.InstrumentID, InstrumentID);
 	strcpy_s(pInputOrderAction.OrderSysID, sys_id);
-
-	return TDEvent::td->ReqOrderAction(pInputOrderAction);;
+	int action_req = TDEvent::td->ReqOrderAction(pInputOrderAction);
+	TDEvent::td_global_mutex.unlock();
+	return action_req;
 }
 
 CThostFtdcInvestorPositionField TDEvent::Postion(TThostFtdcExchangeIDType ExchangeID, TThostFtdcInstrumentIDType InstrumentID)
@@ -112,7 +114,7 @@ CThostFtdcInvestorPositionField TDEvent::Postion(TThostFtdcExchangeIDType Exchan
 	strcpy(pQryInvestorPosition.ExchangeID, InstrumentID);
 
 	CThostFtdcInvestorPositionField rtn_pos = TDEvent::td->ReqQryInvestorPosition(pQryInvestorPosition);
-	TDEvent::td_global_mutex.lock();
+	TDEvent::td_global_mutex.unlock();
 	return rtn_pos;
 }
 
@@ -120,7 +122,7 @@ CThostFtdcTradingAccountField TDEvent::Account()
 {
 	TDEvent::td_global_mutex.lock();
 	CThostFtdcTradingAccountField rtn_acc = TDEvent::td->ReqQryTradingAccount();
-	TDEvent::td_global_mutex.lock();
+	TDEvent::td_global_mutex.unlock();
 	return rtn_acc;
 }
 

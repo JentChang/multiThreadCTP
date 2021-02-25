@@ -52,18 +52,19 @@ void Strategy_rb_rsi::ReceiveTick(TickInfomation tick)
 	//}
 	if (this->istest)
 	{
-		CThostFtdcOrderField pOrder;
-		pOrder = this->LONG(4520, 1, "rb2105");
-		std::cout << "order id : " << pOrder.OrderSysID << endl;
-		std::cout << " 成交数量 " << pOrder.VolumeTraded << " 剩余数量 " << pOrder.VolumeTotal << endl;
-
+		//CThostFtdcOrderField pOrder;
+		//pOrder = this->LONG(4520, 1, "rb2105");
+		//std::cout << "order id : " << pOrder.OrderSysID << endl;
+		//std::cout << " 成交数量 " << pOrder.VolumeTraded << " 剩余数量 " << pOrder.VolumeTotal << endl;
+		//int action_rtn = this->tdevent->ACTION(pOrder.OrderSysID, "SHFE", this->__InstrumentID);
+		//std::cout << "action: " << action_rtn << endl;
 
 		///资金
 		CThostFtdcTradingAccountField acc = this->tdevent->Account();
 		///持仓
 		CThostFtdcInvestorPositionField pos = this->tdevent->Postion("SHFE", this->__InstrumentID);
 
-		if (strcmp(acc.TradingDay, "111") == 0)
+		if (strcmp(acc.TradingDay, "222") == 0)
 		{
 			std::cout << "资金查询返回 nullpter" << endl;
 		}
@@ -71,7 +72,7 @@ void Strategy_rb_rsi::ReceiveTick(TickInfomation tick)
 			std::cout << " 可用资金: " << acc.Available << " 当前保证金总额: " << acc.CurrMargin << endl;
 		}
 
-		if (pos.Position == -1)
+		if (pos.Position == -2)
 		{
 			std::cout << "持仓查询返回 nullpter" << endl;
 		}
@@ -79,13 +80,10 @@ void Strategy_rb_rsi::ReceiveTick(TickInfomation tick)
 			std::cout << " 今日持仓: " << pos.Position << " 持仓方向: " << pos.PosiDirection << endl;
 		}
 
-		int action_rtn = this->tdevent->ACTION(pOrder.OrderSysID, "SHFE", this->__InstrumentID);
-		std::cout << "action: " << action_rtn << endl;
+
 
 		this->istest = false;
 	}
-
-	
 }
 
 void Strategy_rb_rsi::OnBar(BarInfomation * bar)

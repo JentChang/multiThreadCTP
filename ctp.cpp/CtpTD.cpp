@@ -361,7 +361,7 @@ void CtpTD::OnRspQryInvestorPosition(CThostFtdcInvestorPositionField * pInvestor
 	{
 		if (bIsLast || pInvestorPosition == nullptr)
 		{
-			this->rtn_position->Position = -1;
+			this->rtn_position->Position = -2;
 		}
 		else {
 			
@@ -384,7 +384,7 @@ void CtpTD::OnRspQryTradingAccount(CThostFtdcTradingAccountField * pTradingAccou
 	{
 		if (bIsLast || pTradingAccount == nullptr)
 		{
-			strcpy(this->rtn_acc->TradingDay, "111");
+			strcpy(this->rtn_acc->TradingDay, "222");
 		}
 		else {
 			memcpy(this->rtn_acc, pTradingAccount, sizeof(CThostFtdcTradingAccountField));
