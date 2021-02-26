@@ -12,7 +12,7 @@ using namespace std;
 
 
 int main(int argc, char* argv[]) {
-	ifstream ifs("../data.json/ctp_config/ctp_config.json");
+	ifstream ifs("../data.json/ctp_config/ctp_config_24.json");
 	IStreamWrapper isw(ifs);
 
 	Document docRead;

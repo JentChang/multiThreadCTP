@@ -24,6 +24,18 @@
 
 using namespace std;
 
+
+#define ACC_TRADING_DAY_EMPYT_FLAG "222"
+#define POSITION_EMPYT_FLAG -99999
+
+#define ACC_TRADING_DAY_ERROR "333"
+#define POSITION_ERROR -77777
+
+#define ACC_TRADING_DAY_INIT "111"
+#define POSITION_INIT -88888
+
+
+
 struct LoginInfo
 {
 	///@param FRONT_ADDR_MD––«Èµÿ÷∑

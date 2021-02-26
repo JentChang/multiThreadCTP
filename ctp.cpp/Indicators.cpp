@@ -19,7 +19,7 @@ void Indicators::make_bar(TickInfomation tick)
 	if (bar_time < "09:00" ||
 		(bar_time >= "15:00" && bar_time < "21:00") ||
 		(bar_time >= "11:30" && bar_time < "13:30") ||
-		bar_time >= "23:00" ||
+		bar_time >= "23:00" ||  
 		(bar_time >= "10:15" & bar_time < "10:30")
 		)
 	{
@@ -44,9 +44,9 @@ void Indicators::make_bar(TickInfomation tick)
 			)
 		{
 			///起始时间不对
-			if (atoi(time_strs[1].c_str()) % 15 != 0)
+			if (atoi(time_strs[1].c_str()) % Indicators::__fre__ != 0)
 			{
-				int utime = atoi(time_strs[1].c_str()) - (atoi(time_strs[1].c_str()) % 15);
+				int utime = atoi(time_strs[1].c_str()) - (atoi(time_strs[1].c_str()) % Indicators::__fre__);
 				string sign = ":";
 				string udatetime = time_strs[0].c_str() + sign + to_string(utime) + sign + time_strs[2].c_str();
 				bar_time = udatetime;

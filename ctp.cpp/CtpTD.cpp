@@ -361,14 +361,14 @@ void CtpTD::OnRspQryInvestorPosition(CThostFtdcInvestorPositionField * pInvestor
 	{
 		if (bIsLast || pInvestorPosition == nullptr)
 		{
-			this->rtn_position->Position = -2;
+			this->rtn_position->Position = POSITION_EMPYT_FLAG;
 		}
 		else {
-			
 			memcpy(this->rtn_position, pInvestorPosition, sizeof(CThostFtdcInvestorPositionField));
 		}
 	}
 	else {
+		this->rtn_position->Position = POSITION_EMPYT_FLAG;
 		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_INTENSITY | FOREGROUND_RED);
 		std::cout << "OnRspQryTradingAccount error:"
 			<< pRspInfo->ErrorID
@@ -384,13 +384,14 @@ void CtpTD::OnRspQryTradingAccount(CThostFtdcTradingAccountField * pTradingAccou
 	{
 		if (bIsLast || pTradingAccount == nullptr)
 		{
-			strcpy(this->rtn_acc->TradingDay, "222");
+			strcpy(this->rtn_acc->TradingDay, ACC_TRADING_DAY_EMPYT_FLAG);
 		}
 		else {
 			memcpy(this->rtn_acc, pTradingAccount, sizeof(CThostFtdcTradingAccountField));
 		}
 	}
 	else {
+		strcpy(this->rtn_acc->TradingDay, ACC_TRADING_DAY_EMPYT_FLAG);
 		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_INTENSITY | FOREGROUND_RED);
 		std::cout << "OnRspQryTradingAccount error:"
 			<< pRspInfo->ErrorID
@@ -437,23 +438,19 @@ CThostFtdcInvestorPositionField CtpTD::ReqQryInvestorPosition(CThostFtdcQryInves
 
 
 	memset(this->rtn_position, 0, sizeof(CThostFtdcInvestorPositionField));
-	this->rtn_position->Position = -1;
+	this->rtn_position->Position = POSITION_INIT;
 	int iResult = this->api->ReqQryInvestorPosition(&pQryInvestorPosition, requestID++);
 	cerr << "--->>> 查询持仓请求: " << ((iResult == 0) ? "成功" : "失败") << endl;
-
-	while (this->rtn_position->Position == -1)
+	if (iResult != 0)
 	{
-
-	}
-	if (iResult == 0)
-	{
-		return 	*this->rtn_position;
-	}
-	else
-	{
-		this->rtn_position->Position = -1;
+		this->rtn_position->Position = POSITION_ERROR;
 		return *this->rtn_position;
 	}
+	while (this->rtn_position->Position == POSITION_INIT)
+	{
+
+	}
+	return 	*this->rtn_position;
 }
 
 CThostFtdcTradingAccountField CtpTD::ReqQryTradingAccount()
@@ -469,23 +466,19 @@ CThostFtdcTradingAccountField CtpTD::ReqQryTradingAccount()
 	strcpy(pQryTradingAccount.AccountID, this->login_info->UserID);
 
 	memset(this->rtn_acc, 0, sizeof(CThostFtdcTradingAccountField));
-	strcpy(this->rtn_acc->TradingDay, "111");
+	strcpy(this->rtn_acc->TradingDay, ACC_TRADING_DAY_INIT);
 	int iResult = this->api->ReqQryTradingAccount(&pQryTradingAccount, requestID++);
 	cerr << "--->>> 查询资金请求: " << ((iResult == 0) ? "成功" : "失败") << endl;
-	while (strcmp(this->rtn_acc->TradingDay, "111") == 0)
+	if (iResult != 0)
 	{
-
-	}
-	if (iResult == 0)
-	{
-		return 	*this->rtn_acc;
-	}
-	else
-	{
-		strcpy(this->rtn_acc->TradingDay, "111");
+		strcpy(this->rtn_acc->TradingDay, ACC_TRADING_DAY_ERROR);
 		return *this->rtn_acc;
 	}
+	while (strcmp(this->rtn_acc->TradingDay, ACC_TRADING_DAY_INIT) == 0)
+	{
 
+	}
+	return 	*this->rtn_acc;
 }
 
 vector<CThostFtdcTradeField>* CtpTD::OnRtnTradeVtr()

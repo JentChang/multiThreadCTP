@@ -22,7 +22,7 @@ public:
 private:
 	ofstream FILEW;
 
-	bool istest = true;
+	bool istest = false;
 
 
 };
