@@ -129,7 +129,7 @@ void Strategy_ex::rtn_order(CThostFtdcOrderField* rtnOrder, TThostFtdcVolumeType
 	}
 	else if (rtnOrder->VolumeTraded > 0)
 	{
-		this->__pos__ += volume;
+		this->__pos__ += rtnOrder->VolumeTraded;
 	}
 	else if (rtnOrder->VolumeTraded != volume)
 	{
