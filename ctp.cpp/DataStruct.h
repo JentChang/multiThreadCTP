@@ -30,9 +30,12 @@ using namespace std;
 
 #define ACC_TRADING_DAY_ERROR "333"
 #define POSITION_ERROR -77777
+#define TN_ORDER_ERROR -77777
 
 #define ACC_TRADING_DAY_INIT "111"
 #define POSITION_INIT -88888
+#define RTN_ORDER_INIT -88888
+
 
 
 

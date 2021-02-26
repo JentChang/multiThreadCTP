@@ -299,25 +299,25 @@ CThostFtdcOrderField CtpTD::ReqOrderInsert(CThostFtdcInputOrderField order)
 	order_insert->UserForceClose = 0;
 
 	memset(this->rtn_order, 0, sizeof(CThostFtdcOrderField));
-	this->rtn_order->RequestID = -1;
+	this->rtn_order->RequestID = RTN_ORDER_INIT;
 	int iResult = this->api->ReqOrderInsert(order_insert, ++requestID);
 	delete order_insert;
 	std::cout << "order requestID: " << requestID - 1;
 	cerr << "--->>> 报单录入请求: " << ((iResult == 0) ? "成功" : "失败") << endl;
-	while (this->rtn_order->RequestID == -1)
+
+	if (iResult != 0)
+	{
+		this->rtn_order->RequestID = TN_ORDER_ERROR;
+		return *this->rtn_order;
+	}
+
+	while (this->rtn_order->RequestID == RTN_ORDER_INIT)
 	{
 
 	}
 	std::cout << " order id : " << this->rtn_order->OrderSysID << endl;
-	if (iResult == 0)
-	{
-		return 	*this->rtn_order;
-	}
-	else
-	{
-		this->rtn_order->RequestID = -1;
-		return *this->rtn_order;
-	}
+
+	return 	*this->rtn_order;
 }
 
 void CtpTD::OnRspOrderInsert(CThostFtdcInputOrderField *pInputOrder, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)

@@ -105,3 +105,147 @@ void Indicators::fre(int f)
 {
 	Indicators::__fre__ = f;
 }
+
+///
+////
+double Indicators::average(double* arr, int size)
+{
+	double sum = 0;
+	for (size_t i = 0; i < size; i++)
+	{
+		sum += arr[i];
+	}
+	return sum / size;
+}
+
+double Indicators::std(double* arr, int size)
+{
+	double average = Indicators::average(arr, size);
+	double sum = 0;
+	for (size_t i = 0; i < size; i++)
+	{
+		sum += pow(arr[i] - average, 2);
+	}
+	return sqrt(sum / size);
+}
+
+double Indicators::RSI(double close, int peridos)
+{
+	double profit_bar = close - Indicators::__rsi_close_pre;
+	Indicators::__rsi_close_pre = close;
+
+	if (Indicators::__rsi_count_num <= peridos)
+	{
+		if (__rsi_count_num == 0)
+		{
+			__rsi_count_num++;
+			return -1;
+		}
+		if (profit_bar > 0)
+		{
+			Indicators::__rsi_proitive_mena = Indicators::__rsi_proitive_mena + profit_bar;
+		}
+		else
+		{
+			Indicators::__rsi_negative_mena = Indicators::__rsi_negative_mena - profit_bar;
+		}
+
+		if (Indicators::__rsi_count_num == peridos)
+		{
+			Indicators::__rsi_proitive_mena = Indicators::__rsi_proitive_mena / peridos;
+			Indicators::__rsi_negative_mena = Indicators::__rsi_negative_mena / peridos;
+		}
+
+		Indicators::__rsi_count_num++;
+		return -1;
+	}
+
+	if (profit_bar > 0)
+	{
+		Indicators::__rsi_proitive_mena = (Indicators::__rsi_proitive_mena * (peridos - 1) + profit_bar) / peridos;
+		Indicators::__rsi_negative_mena = (Indicators::__rsi_negative_mena * (peridos - 1) + 0) / peridos;
+	}
+	else
+	{
+		Indicators::__rsi_proitive_mena = (Indicators::__rsi_proitive_mena * (peridos - 1) + 0) / peridos;
+		Indicators::__rsi_negative_mena = (Indicators::__rsi_negative_mena * (peridos - 1) - profit_bar) / peridos;
+	}
+	double rs = Indicators::__rsi_proitive_mena / (Indicators::__rsi_negative_mena);
+
+	return rs / (1 + rs) * 100;
+}
+
+
+double Indicators::ATR(double high, double low, double close, int timeperiod)
+{
+	double high_low = abs(high - low);
+	double high_close = abs(high - __atr_close_pre);
+	double low_close = abs(low - __atr_close_pre);
+	double _arr[3] = { high_low, high_close, low_close };
+	double __tr = Indicators::max_arr(_arr, 3);
+	__atr_close_pre = close;
+
+	if (__atr_count_num <= timeperiod)
+	{
+		if (__atr_count_num == 0)
+		{
+			__atr_count_num++;
+			return -1;
+		}
+		__atr_atr += __tr;
+		if (__atr_count_num == timeperiod)
+		{
+			__atr_atr /= timeperiod;
+		}
+		__atr_count_num++;
+		return __atr_atr;
+	}
+	__atr_atr = (__atr_atr * (timeperiod - 1) + __tr) / timeperiod;
+	return __atr_atr;
+}
+
+double Indicators::max_arr(double* arr, int size)
+{
+	double max_value = 0;
+	for (size_t i = 0; i < size; i++)
+	{
+		if (arr[i] > max_value)
+		{
+			max_value = arr[i];
+		}
+	}
+	return max_value;
+}
+
+double Indicators::ATR_compire_AATR(double atr, int timeperiod = 300)
+{
+	//if (__aatr_count_num <= timeperiod)
+	//{
+	//	__aatr_aatr += atr;
+	//	
+	//	if (__aatr_count_num == timeperiod)
+	//	{
+	//		__aatr_aatr /= timeperiod;
+	//		__aatr_count_num++;
+	//		return __aatr_aatr;
+	//	}
+	//	__aatr_count_num++;
+	//	return -1;
+	//}
+
+	//__aatr_aatr = (__aatr_aatr * (timeperiod - 1) + atr) / timeperiod;
+
+	__aatr_atr_vec.push_back(atr);
+	__aatr_atr_vec.erase(__aatr_atr_vec.begin());
+	if (__aatr_count_num < timeperiod)
+	{
+		__aatr_sum += atr;
+		__aatr_count_num++;
+		return -1;
+	}
+	__aatr_sum += atr;
+	__aatr_aatr = __aatr_sum / timeperiod;
+	__aatr_sum -= __aatr_atr_vec.at(0);
+
+	return atr - __aatr_aatr;
+}
