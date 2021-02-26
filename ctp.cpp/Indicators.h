@@ -59,5 +59,4 @@ private:
 	double __aatr_atr;
 	int __aatr_count_num = 0;
 };
-
 #endif
