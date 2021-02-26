@@ -39,13 +39,13 @@ void Strategy_ex::ReceiveTick(TickInfomation tick)
 
 void Strategy_ex::OnBar(BarInfomation * bar)
 {
-	//ÖØÖÃ
+	//é‡ç½®
 	this->__long__ = false;
 	this->__short__ = false;
 	this->__sell__ = false;
 	this->__cover__ = false;
 
-	///ÊµÏÖÐÅºÅ
+	///å®žçŽ°ä¿¡å·
 	if (true)
 	{
 		///..........
@@ -106,7 +106,7 @@ void Strategy_ex::trading(TickInfomation tick, TThostFtdcVolumeType volume, TTho
 			this->rtn_order(&rtnOrder, -volume);
 		}
 	}
-	//Æ½
+	//å¹³
 	else if (this->__pos__ > 0 && this->__sell__)
 	{ 
 		if (tick.BidPrice1 == 0) { return; } 
@@ -125,13 +125,13 @@ void Strategy_ex::rtn_order(CThostFtdcOrderField* rtnOrder, TThostFtdcVolumeType
 {
 	if (rtnOrder->RequestID == TN_ORDER_ERROR)
 	{
-		std::cout << " ¶©µ¥Â¼Èë´íÎó" << endl;
+		std::cout << " è®¢å•å½•å…¥é”™è¯¯" << endl;
 	}
-	else if (rtnOrder->VolumeTraded == volume)
+	else if (rtnOrder->VolumeTraded > 0)
 	{
 		this->__pos__ += volume;
 	}
-	else
+	else if (rtnOrder->VolumeTraded != volume)
 	{
 		int action_rtn = this->tdevent->ACTION(rtnOrder->OrderSysID, "SHFE", this->__InstrumentID);
 	}
