@@ -13,12 +13,12 @@ if (WIN32)
 	message(STATUS "########### os is windows ###########")
 	include_directories(
 		"${CMAKE_CURRENT_SOURCE_DIR}/../libs/rapidjson/include" 
-		"${CMAKE_CURRENT_SOURCE_DIR}/../libs/ctpapi/6.3.15_20190220_tradeapi64_se_windows"
-		#"${CMAKE_CURRENT_SOURCE_DIR}/../libs/ctpapi/6.3.15_20190220_tradeapi_se_windows"
+		#"${CMAKE_CURRENT_SOURCE_DIR}/../libs/ctpapi/6.3.15_20190220_tradeapi64_se_windows"
+		"${CMAKE_CURRENT_SOURCE_DIR}/../libs/ctpapi/20200106_tradeapi64_se_windows"
 	)
 	link_directories(
-		"${CMAKE_CURRENT_SOURCE_DIR}/../libs/ctpapi/6.3.15_20190220_tradeapi64_se_windows"
-		#"${CMAKE_CURRENT_SOURCE_DIR}/../libs/ctpapi/6.3.15_20190220_tradeapi_se_windows"
+		#"${CMAKE_CURRENT_SOURCE_DIR}/../libs/ctpapi/6.3.15_20190220_tradeapi64_se_windows"
+		"${CMAKE_CURRENT_SOURCE_DIR}/../libs/ctpapi/20200106_tradeapi64_se_windows"
 	)
 
 elseif(UNIX)	
