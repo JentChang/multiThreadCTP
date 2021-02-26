@@ -42,5 +42,19 @@ git subtree add --prefix=lib/rapidjson   https://github.com/Tencent/rapidjson.gi
 
 vs中编译，设置cpp为启动项目 bebug/release x64运行
 
+
+昨晚我得一梦 实少有  
+孤猿我进入在那输出的一个终端  
+见一条日志在那终端转  
+闪硕红光照我的双眸  
+亮光刺的难擎受  
+高叫声IT快把程序关  
+只吓得孤猿我就高声吼   
+回头来又不见那输出一终端  
+醒来不觉三更后  
+浑身上下冷汗流  
+这样的机关我解也解不透  
+bug你与我解根由  
+
 	
 
