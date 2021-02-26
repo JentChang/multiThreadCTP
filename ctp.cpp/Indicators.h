@@ -56,7 +56,7 @@ private:
 
 	double __aatr_aatr = 0;
 	double __aatr_sum = 0;
-	vector<double> __aatr_atr_vec;
+	double __aatr_atr;
 	int __aatr_count_num = 0;
 };
 

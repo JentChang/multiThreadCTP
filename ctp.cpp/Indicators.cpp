@@ -235,8 +235,6 @@ double Indicators::ATR_compire_AATR(double atr, int timeperiod = 300)
 
 	//__aatr_aatr = (__aatr_aatr * (timeperiod - 1) + atr) / timeperiod;
 
-	__aatr_atr_vec.push_back(atr);
-	__aatr_atr_vec.erase(__aatr_atr_vec.begin());
 	if (__aatr_count_num < timeperiod)
 	{
 		__aatr_sum += atr;
@@ -245,7 +243,7 @@ double Indicators::ATR_compire_AATR(double atr, int timeperiod = 300)
 	}
 	__aatr_sum += atr;
 	__aatr_aatr = __aatr_sum / timeperiod;
-	__aatr_sum -= __aatr_atr_vec.at(0);
+	__aatr_sum -= atr;
 
 	return atr - __aatr_aatr;
 }
