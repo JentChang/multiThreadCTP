@@ -39,13 +39,21 @@ void Strategy_ex::ReceiveTick(TickInfomation tick)
 
 void Strategy_ex::OnBar(BarInfomation * bar)
 {
+<<<<<<< HEAD
 	//ÖØÖÃ
+=======
+	//é‡ç½®
+>>>>>>> c0fd9c341d5a2e5f8974ac1794f51791d07c21de
 	this->__long__ = false;
 	this->__short__ = false;
 	this->__sell__ = false;
 	this->__cover__ = false;
 
+<<<<<<< HEAD
 	///ÊµÏÖÐÅºÅ
+=======
+	///å®žçŽ°ä¿¡å·
+>>>>>>> c0fd9c341d5a2e5f8974ac1794f51791d07c21de
 	if (true)
 	{
 		///..........
@@ -106,7 +114,11 @@ void Strategy_ex::trading(TickInfomation tick, TThostFtdcVolumeType volume, TTho
 			this->rtn_order(&rtnOrder, -volume);
 		}
 	}
+<<<<<<< HEAD
 	//Æ½
+=======
+	//å¹³
+>>>>>>> c0fd9c341d5a2e5f8974ac1794f51791d07c21de
 	else if (this->__pos__ > 0 && this->__sell__)
 	{ 
 		if (tick.BidPrice1 == 0) { return; } 
@@ -125,7 +137,11 @@ void Strategy_ex::rtn_order(CThostFtdcOrderField* rtnOrder, TThostFtdcVolumeType
 {
 	if (rtnOrder->RequestID == TN_ORDER_ERROR)
 	{
+<<<<<<< HEAD
 		std::cout << " ¶©µ¥Â¼Èë´íÎó" << endl;
+=======
+		std::cout << " è®¢å•å½•å…¥é”™è¯¯" << endl;
+>>>>>>> c0fd9c341d5a2e5f8974ac1794f51791d07c21de
 	}
 	else if (rtnOrder->VolumeTraded > 0)
 	{
