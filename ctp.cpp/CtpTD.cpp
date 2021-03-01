@@ -458,12 +458,12 @@ CThostFtdcTradingAccountField CtpTD::ReqQryTradingAccount()
 	CThostFtdcQryTradingAccountField pQryTradingAccount;
 	memset(&pQryTradingAccount, 0, sizeof(CThostFtdcQryTradingAccountField));
 
-	///经纪公司代码
-	strcpy(pQryTradingAccount.BrokerID, this->login_info->BrokerID);
-	///投资者代码
-	strcpy(pQryTradingAccount.InvestorID, this->login_info->UserID);
-	///投资者帐号
-	strcpy(pQryTradingAccount.AccountID, this->login_info->UserID);
+	/////经纪公司代码
+	//strcpy(pQryTradingAccount.BrokerID, this->login_info->BrokerID);
+	/////投资者代码
+	//strcpy(pQryTradingAccount.InvestorID, this->login_info->UserID);
+	/////投资者帐号
+	//strcpy(pQryTradingAccount.AccountID, this->login_info->UserID);
 
 	memset(this->rtn_acc, 0, sizeof(CThostFtdcTradingAccountField));
 	strcpy(this->rtn_acc->TradingDay, ACC_TRADING_DAY_INIT);
