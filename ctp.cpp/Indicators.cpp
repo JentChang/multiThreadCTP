@@ -15,22 +15,28 @@ Indicators::~Indicators()
 void Indicators::make_bar(TickInfomation tick)
 {
 	string bar_time = tick.UpdateTime;
-	bar_time = bar_time.substr(0, 5);
-	if (bar_time < "09:00" ||
-		(bar_time >= "15:00" && bar_time < "21:00") ||
-		(bar_time >= "11:30" && bar_time < "13:30") ||
-		bar_time >= "23:00" ||  
-		(bar_time >= "10:15" & bar_time < "10:30")
-		)
-	{
-		return;
-	}
+	/////bar_time = bar_time.substr(0, 8);
+	//if (bar_time < "09:00" ||
+	//	(bar_time >= "15:00" && bar_time < "21:00") ||
+	//	(bar_time >= "11:30" && bar_time < "13:30") ||
+	//	bar_time >= "23:00" ||  
+	//	(bar_time >= "10:15" & bar_time < "10:30")
+	//	)
+	//{
+	//	return;
+	//}
 	// ºÏ³ÉkÏß
 	bool newMinitue = false;
 	Indicators::__barclose__ = false;
 	Indicators::time_strs = Split(bar_time, ":");
-	if (time_strs.size() < 2)
+	if (time_strs.size() < 3)
 	{
+		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_INTENSITY | FOREGROUND_RED);
+		std::cout << "Indicators::make_bar error:"
+			<< bar_time << " "
+			<< tick.UpdateTime 
+			<< std::endl;
+		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_INTENSITY);
 		return;
 	}
 	if (Indicators::__bar__.EMPTY)
