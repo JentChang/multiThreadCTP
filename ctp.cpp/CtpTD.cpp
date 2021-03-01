@@ -368,7 +368,7 @@ void CtpTD::OnRspQryInvestorPosition(CThostFtdcInvestorPositionField * pInvestor
 		}
 	}
 	else {
-		this->rtn_position->Position = POSITION_EMPYT_FLAG;
+		this->rtn_position->Position = POSITION_ERROR;
 		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_INTENSITY | FOREGROUND_RED);
 		std::cout << "OnRspQryTradingAccount error:"
 			<< pRspInfo->ErrorID
@@ -391,7 +391,7 @@ void CtpTD::OnRspQryTradingAccount(CThostFtdcTradingAccountField * pTradingAccou
 		}
 	}
 	else {
-		strcpy(this->rtn_acc->TradingDay, ACC_TRADING_DAY_EMPYT_FLAG);
+		strcpy(this->rtn_acc->TradingDay, ACC_TRADING_DAY_ERROR);
 		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_INTENSITY | FOREGROUND_RED);
 		std::cout << "OnRspQryTradingAccount error:"
 			<< pRspInfo->ErrorID
