@@ -5,12 +5,14 @@ map<string, TickInfomation> MDEvent::__tick_map;
 bool MDEvent::ISWRITING;
 int MDEvent::ISREADING;
 vector<StrategyTemplate*> MDEvent::strategy_vtr;
+bool MDEvent::threadclose;
 
 
 MDEvent::MDEvent()
 {
 	MDEvent::ISWRITING = false;
 	MDEvent::ISREADING = false;
+	MDEvent::threadclose = false;
 
 	this->strategy_vtr.clear();
 	this->thread_vtr.clear();
@@ -54,6 +56,11 @@ void MDEvent::StrategyStart()
 	}
 }
 
+void MDEvent::StrategyEnd()
+{
+	MDEvent::threadclose = true;
+}
+
 
 void MDEvent::SendTickThreadFun(StrategyTemplate* st)
 {
@@ -61,7 +68,7 @@ void MDEvent::SendTickThreadFun(StrategyTemplate* st)
 	static TThostFtdcInstrumentIDType thisthread_ins;
 	strcpy(thisthread_ins, st->InstrumentID());
 
-	while (true)
+	while (!MDEvent::threadclose)
 	{
 		while (MDEvent::ISWRITING)
 		{
@@ -78,6 +85,6 @@ void MDEvent::SendTickThreadFun(StrategyTemplate* st)
 		{
 			st->ReceiveTick(tick);
 		}
-
+		Sleep(1);
 	}
 }

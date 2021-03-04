@@ -16,9 +16,13 @@ public:
 
 	void AddStrategy(StrategyTemplate*);
 	void StrategyStart();
+	void StrategyEnd();
 
 private:
 	static void SendTickThreadFun(StrategyTemplate*);
+
+public:
+	vector<std::thread> thread_vtr;
 
 private:
 	static map<string, TickInfomation> __tick_map;
@@ -27,7 +31,8 @@ private:
 	static int ISREADING;
 
 	static vector<StrategyTemplate*> strategy_vtr;
-	vector<std::thread> thread_vtr;
+	
+	static bool threadclose;
 };
 
 
