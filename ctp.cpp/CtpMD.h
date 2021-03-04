@@ -33,7 +33,8 @@ public:
 	///@param nTimeLapse 距离上次接收报文的时间
 	virtual void OnHeartBeatWarning(int nTimeLapse) {};
 
-
+	///订阅行情
+	int OnSubscribeMarketData(char *ppInstrumentID[], int nCount);
 	///登录请求响应
 	virtual void OnRspUserLogin(CThostFtdcRspUserLoginField* pRspUserLogin, CThostFtdcRspInfoField* pRspInfo, int nRequestID, bool bIsLast);
 
@@ -49,16 +50,18 @@ public:
 	///深度行情通知
 	virtual void OnRtnDepthMarketData(CThostFtdcDepthMarketDataField* pDepthMarketData);
 
-private:
+public:
 	CThostFtdcMdApi* api = nullptr;
-	
+
+private:
 	CThostFtdcReqUserLoginField* userLogin = nullptr;
 	int requestID;
 
 	MDEvent* mdevent = nullptr;
 	ofstream FILEW;
 	
-
+	char** insts = nullptr;
+	int insts_count;
 };
 
 #endif 

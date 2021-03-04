@@ -42,12 +42,25 @@ void CtpMD::OnFrontDisconnected(int nReason)
 	std::cout << "OnFrontDisconnected, nReason:"<< nReason << std::endl;
 }
 
+int CtpMD::OnSubscribeMarketData(char * ppInstrumentID[], int nCount)
+{
+	if (this->insts == nullptr)
+	{
+		this->insts = ppInstrumentID;
+		this->insts_count = nCount;
+	}
+	return this->api->SubscribeMarketData(ppInstrumentID, nCount);
+}
 
 void CtpMD::OnRspUserLogin(CThostFtdcRspUserLoginField* pRspUserLogin, CThostFtdcRspInfoField* pRspInfo, int nRequestID, bool bIsLast)
 {
 	if (nullptr == pRspInfo || 0 == pRspInfo->ErrorID)
 	{
 		std::cout << "OnRspUserLogin ok"<< std::endl;
+		if (this->insts != nullptr)
+		{
+			this->OnSubscribeMarketData(this->insts, this->insts_count);
+		}
 	}
 	else {
 		std::cout << "OnRspUserLogin error:" 
