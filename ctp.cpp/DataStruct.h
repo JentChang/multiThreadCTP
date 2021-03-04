@@ -20,7 +20,7 @@
 #include <queue>
 #include <map>
 
-
+using namespace rapidjson;
 
 using namespace std;
 
