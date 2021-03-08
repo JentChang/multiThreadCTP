@@ -29,7 +29,8 @@ CtpMD::~CtpMD()
 
 void CtpMD::OnFrontConnected()
 {
-	std::cout << "OnFrontConnected..." << std::endl;
+	LOG("OnFrontConnected...\n")
+	//std::cout << "OnFrontConnected..." << std::endl;
 	if (userLogin)
 	{
 		api->ReqUserLogin(userLogin, requestID++);
@@ -39,7 +40,8 @@ void CtpMD::OnFrontConnected()
 
 void CtpMD::OnFrontDisconnected(int nReason)
 {
-	std::cout << "OnFrontDisconnected, nReason:"<< nReason << std::endl;
+	LOG("OnFrontDisconnected, nReason: [%d]\n", nReason)
+	//std::cout << "OnFrontDisconnected, nReason:"<< nReason << std::endl;
 }
 
 int CtpMD::OnSubscribeMarketData(char * ppInstrumentID[], int nCount)
@@ -56,17 +58,19 @@ void CtpMD::OnRspUserLogin(CThostFtdcRspUserLoginField* pRspUserLogin, CThostFtd
 {
 	if (nullptr == pRspInfo || 0 == pRspInfo->ErrorID)
 	{
-		std::cout << "OnRspUserLogin ok"<< std::endl;
+		LOG("OnRspUserLogin ok\n");
+		//std::cout << "OnRspUserLogin ok"<< std::endl;
 		if (this->insts != nullptr)
 		{
 			this->OnSubscribeMarketData(this->insts, this->insts_count);
 		}
 	}
 	else {
-		std::cout << "OnRspUserLogin error:" 
-			<< pRspInfo->ErrorID 
-			<< pRspInfo->ErrorMsg
-			<< std::endl;
+		LOG("OnRspUserLogin ERROR: [%d %s]\n", pRspInfo->ErrorID, pRspInfo->ErrorMsg);
+		//std::cout << "OnRspUserLogin error:" 
+		//	<< pRspInfo->ErrorID 
+		//	<< pRspInfo->ErrorMsg
+		//	<< std::endl;
 	}
 }
 
@@ -74,10 +78,11 @@ void CtpMD::OnRspUserLogin(CThostFtdcRspUserLoginField* pRspUserLogin, CThostFtd
 ///错误应答
 void CtpMD::OnRspError(CThostFtdcRspInfoField* pRspInfo, int nRequestID, bool bIsLast)
 {
-	std::cout << "OnRspError:"
-		<< pRspInfo->ErrorID
-		<< pRspInfo->ErrorMsg
-		<< std::endl;
+	LOG("OnRspError: [%d %s]\n", pRspInfo->ErrorID, pRspInfo->ErrorMsg);
+	//std::cout << "OnRspError: [%d %s]"
+	//	<< pRspInfo->ErrorID
+	//	<< pRspInfo->ErrorMsg
+	//	<< std::endl;
 }
 
 ///订阅行情应答
@@ -85,13 +90,15 @@ void CtpMD::OnRspSubMarketData(CThostFtdcSpecificInstrumentField* pSpecificInstr
 {
 	if (nullptr == pRspInfo || 0 == pRspInfo->ErrorID)
 	{
-		std::cout << "OnRspSubMarketData ok" << std::endl;
+		LOG("OnRspSubMarketData ok\n");
+		//std::cout << "OnRspSubMarketData ok" << std::endl;
 	}
 	else {
-		std::cout << "OnRspSubMarketData error:"
-			<< pRspInfo->ErrorID
-			<< pRspInfo->ErrorMsg
-			<< std::endl;
+		LOG("OnRspSubMarketData: [%d %s]\n", pRspInfo->ErrorID, pRspInfo->ErrorMsg);
+		//std::cout << "OnRspSubMarketData error:"
+		//	<< pRspInfo->ErrorID
+		//	<< pRspInfo->ErrorMsg
+		//	<< std::endl;
 	}
 }
 

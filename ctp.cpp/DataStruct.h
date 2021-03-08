@@ -36,7 +36,8 @@ using namespace std;
 #define POSITION_INIT -88888
 #define RTN_ORDER_INIT -88888
 
-
+extern FILE *logfile;
+#define LOG(format, ...) fprintf(logfile, format, __VA_ARGS__); printf(format, __VA_ARGS__); fflush(logfile);
 
 
 struct LoginInfo

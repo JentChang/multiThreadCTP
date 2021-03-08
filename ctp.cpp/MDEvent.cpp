@@ -87,4 +87,5 @@ void MDEvent::SendTickThreadFun(StrategyTemplate* st)
 		}
 		Sleep(1);
 	}
+	LOG("[%s] SendTickThreadFun END\n", st->InstrumentID());
 }

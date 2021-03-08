@@ -96,12 +96,10 @@ public:
 
 	vector<CThostFtdcTradeField>* OnRtnTradeVtr();
 
-private:
-
-
-private:
+public:
 	CThostFtdcTraderApi* api = nullptr;
 
+private:
 	CThostFtdcReqUserLoginField* userLogin = nullptr;
 	CThostFtdcRspUserLoginField* userLogin_RSP = nullptr;
 	int requestID;

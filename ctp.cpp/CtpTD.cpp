@@ -41,31 +41,33 @@ void CtpTD::OnFrontConnected()
 		strcpy(auth_info.AppID, this->login_info->AppID);
 
 		int AuthRet = api->ReqAuthenticate(&auth_info, requestID++);
-		std::cout << "ReqAuthenticate response:" << AuthRet << std::endl;
-
+		LOG("ReqAuthenticate response: [%d]\n", AuthRet);
 	}
 }
 
 void CtpTD::OnFrontDisconnected(int nReason)
 {
-	std::cout << "OnFrontDisconnected, nReason:" << nReason << std::endl;
+	LOG("OnFrontDisconnected, nReason: [%d]\n", nReason)
+	//std::cout << "OnFrontDisconnected, nReason:" << nReason << std::endl;
 }
 
 void CtpTD::OnRspAuthenticate(CThostFtdcRspAuthenticateField * pRspAuthenticateField, CThostFtdcRspInfoField * pRspInfo, int nRequestID, bool bIsLast)
 {
 	if (nullptr == pRspInfo || 0 == pRspInfo->ErrorID)
 	{
-		std::cout << "OnRspAuthenticate ok" << std::endl;
+		LOG("OnRspAuthenticate ok\n");
+		//std::cout << "OnRspAuthenticate ok" << std::endl;
 		api->ReqUserLogin(userLogin, requestID++);
 	}
 	else
 	{
-		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_INTENSITY | FOREGROUND_RED);
-		std::cout << "OnRspAuthenticate error:"
-			<< pRspInfo->ErrorID
-			<< pRspInfo->ErrorMsg
-			<< std::endl;
-		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_INTENSITY);
+		LOG("OnRspAuthenticate ERROR : [%d %s]\n", pRspInfo->ErrorID, pRspInfo->ErrorMsg);
+		//SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_INTENSITY | FOREGROUND_RED);
+		//std::cout << "OnRspAuthenticate error:"
+		//	<< pRspInfo->ErrorID
+		//	<< pRspInfo->ErrorMsg
+		//	<< std::endl;
+		//SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_INTENSITY);
 	}
 }
 
@@ -74,21 +76,33 @@ void CtpTD::OnRspUserLogin(CThostFtdcRspUserLoginField* pRspUserLogin, CThostFtd
 {
 	if (nullptr == pRspInfo || 0 == pRspInfo->ErrorID)
 	{
-		std::cout << "OnRspUserLogin ok" << std::endl;
+		LOG("OnRspUserLogin ok\n")
+		//std::cout << "OnRspUserLogin ok" << std::endl;
 		this->tradingDate = api->GetTradingDay();
 
 		this->userLogin_RSP = pRspUserLogin;
 
-		std::cout << "TradingDay:" << tradingDate.c_str() << std::endl;
-		cout << "登录成功. " << endl
-			<< "前置编号:" << pRspUserLogin->FrontID << endl
-			<< "会话编号" << pRspUserLogin->SessionID << endl
-			<< "最大报单引用:" << pRspUserLogin->MaxOrderRef << endl
-			<< "上期所时间：" << pRspUserLogin->SHFETime << endl
-			<< "大商所时间：" << pRspUserLogin->DCETime << endl
-			<< "郑商所时间：" << pRspUserLogin->CZCETime << endl
-			<< "中金所时间：" << pRspUserLogin->FFEXTime << endl
-			<< "能源中心时间：" << pRspUserLogin->INETime << endl;
+		LOG("TradingDay: [%s]\n", tradingDate.c_str());
+		LOG("登录成功. \n");
+		LOG("前置编号: [%d]\n", pRspUserLogin->FrontID);
+		LOG("会话编号: [%d]\n", pRspUserLogin->SessionID);
+		LOG("最大报单引用: [%s]\n", pRspUserLogin->MaxOrderRef);
+		LOG("上期所时间: [%s]\n", pRspUserLogin->SHFETime);
+		LOG("大商所时间: [%s]\n", pRspUserLogin->DCETime);
+		LOG("郑商所时间: [%s]\n", pRspUserLogin->CZCETime);
+		LOG("中金所时间: [%s]\n", pRspUserLogin->FFEXTime);
+		LOG("能源中心时间: [%s]\n", pRspUserLogin->INETime);
+
+		//std::cout << "TradingDay:" << tradingDate.c_str() << std::endl;
+		//cout << "登录成功. " << endl
+		//	<< "前置编号:" << pRspUserLogin->FrontID << endl
+		//	<< "会话编号" << pRspUserLogin->SessionID << endl
+		//	<< "最大报单引用:" << pRspUserLogin->MaxOrderRef << endl
+		//	<< "上期所时间：" << pRspUserLogin->SHFETime << endl
+		//	<< "大商所时间：" << pRspUserLogin->DCETime << endl
+		//	<< "郑商所时间：" << pRspUserLogin->CZCETime << endl
+		//	<< "中金所时间：" << pRspUserLogin->FFEXTime << endl
+		//	<< "能源中心时间：" << pRspUserLogin->INETime << endl;
 		
 		//向期货商第一次发送交易指令前，需要先查询投资者结算结果， 投资者确认以后才能交易。
 		//查询是否已经做了确认
@@ -99,12 +113,13 @@ void CtpTD::OnRspUserLogin(CThostFtdcRspUserLoginField* pRspUserLogin, CThostFtd
 		api->ReqSettlementInfoConfirm(&pSettlementInfoConfirm, requestID++);
 	}
 	else {
-		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_INTENSITY | FOREGROUND_RED);
-		std::cout << "OnRspUserLogin error:"
-			<< pRspInfo->ErrorID
-			<< pRspInfo->ErrorMsg
-			<< std::endl;
-		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_INTENSITY);
+		LOG("OnRspUserLogin ERROR: [%d %s]\n", pRspInfo->ErrorID, pRspInfo->ErrorMsg);
+		//SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_INTENSITY | FOREGROUND_RED);
+		//std::cout << "OnRspUserLogin error:"
+		//	<< pRspInfo->ErrorID
+		//	<< pRspInfo->ErrorMsg
+		//	<< std::endl;
+		//SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_INTENSITY);
 	}
 }
 
@@ -116,11 +131,12 @@ void CtpTD::OnRspQrySettlementInfoConfirm(CThostFtdcSettlementInfoConfirmField* 
 	{
 		if (nullptr == pSettlementInfoConfirm)
 		{
-			std::cout << "OnRspQrySettlementInfoConfirm:"
-				<< pSettlementInfoConfirm->ConfirmDate << ","
-				<< pSettlementInfoConfirm->ConfirmTime << ","
-				<< bIsLast
-				<< std::endl;
+			LOG("OnRspQrySettlementInfoConfirm: [%s %s]\n", pSettlementInfoConfirm->ConfirmDate, pSettlementInfoConfirm->ConfirmTime);
+			//std::cout << "OnRspQrySettlementInfoConfirm:"
+			//	<< pSettlementInfoConfirm->ConfirmDate << ","
+			//	<< pSettlementInfoConfirm->ConfirmTime << ","
+			//	<< bIsLast
+			//	<< std::endl;
 
 
 			string lastConfirmDate = pSettlementInfoConfirm->ConfirmDate;
@@ -151,19 +167,21 @@ void CtpTD::OnRspQrySettlementInfoConfirm(CThostFtdcSettlementInfoConfirmField* 
 		}
 	}
 	else {
-		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_INTENSITY | FOREGROUND_RED);
-		std::cout << "OnRspQrySettlementInfoConfirm error:"
-			<< pRspInfo->ErrorID
-			<< pRspInfo->ErrorMsg
-			<< std::endl;
-		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_INTENSITY);
+		LOG("OnRspQrySettlementInfoConfirm ERROR: [%d, %s]\n", pRspInfo->ErrorID, pRspInfo->ErrorMsg);
+		//SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_INTENSITY | FOREGROUND_RED);
+		//std::cout << "OnRspQrySettlementInfoConfirm error:"
+		//	<< pRspInfo->ErrorID
+		//	<< pRspInfo->ErrorMsg
+		//	<< std::endl;
+		//SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_INTENSITY);
 	}
 }
 
 ///请求查询投资者结算结果响应
 void CtpTD::OnRspQrySettlementInfo(CThostFtdcSettlementInfoField *pSettlementInfo, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast) {
-	cout << "请求查询投资者结算结果响应, ,  ID: " << nRequestID << endl;
-	cout << pSettlementInfo->Content << endl;
+	LOG("请求查询投资者结算结果响应, ,  ID: [ %d %s]\n", nRequestID, pSettlementInfo->Content);
+	//cout << "请求查询投资者结算结果响应, ,  ID: " << nRequestID << endl;
+	//cout << pSettlementInfo->Content << endl;
 	if (pRspInfo == nullptr || pRspInfo->ErrorID == 0) {
 		if (bIsLast == true) {
 			//确认投资者结算结果
@@ -172,11 +190,13 @@ void CtpTD::OnRspQrySettlementInfo(CThostFtdcSettlementInfoField *pSettlementInf
 			strncpy(field.BrokerID, pSettlementInfo->BrokerID, sizeof(TThostFtdcBrokerIDType));
 			strncpy(field.InvestorID, pSettlementInfo->InvestorID, sizeof(TThostFtdcInvestorIDType));
 			int result = api->ReqSettlementInfoConfirm(&field, requestID++);
-			cout << "result:" << result << endl;
+			LOG("result: [%d]\n", result);
+			//cout << "result:" << result << endl;
 		}
 	}
 	else {
-		cout << "错误应答:" << pRspInfo->ErrorID << pRspInfo->ErrorMsg << " 请求ID为" << requestID << endl;
+		LOG("错误应答: [%d %s]  请求ID为 [%d]\n", pRspInfo->ErrorID, pRspInfo->ErrorMsg, requestID);
+		//cout << "错误应答:" << pRspInfo->ErrorID << pRspInfo->ErrorMsg << " 请求ID为" << requestID << endl;
 	}
 }
 
@@ -186,10 +206,15 @@ void CtpTD::OnRspSettlementInfoConfirm(CThostFtdcSettlementInfoConfirmField* pSe
 	if (nullptr == pRspInfo || 0 == pRspInfo->ErrorID)
 	{
 		if (pSettlementInfoConfirm != nullptr) {
-			cout << "经纪公司代码:" << pSettlementInfoConfirm->BrokerID << endl
-				<< "用户账号:" << pSettlementInfoConfirm->InvestorID << endl
-				<< "确定日期：" << pSettlementInfoConfirm->ConfirmDate << endl
-				<< "确定时间：" << pSettlementInfoConfirm->ConfirmTime << endl;
+			LOG("经纪公司代码: [%s]\n", pSettlementInfoConfirm->BrokerID);
+			LOG("用户账号: [%s]\n", pSettlementInfoConfirm->InvestorID);
+			LOG("确定日期: [%s]\n", pSettlementInfoConfirm->ConfirmDate);
+			LOG("确定时间: [%s]\n", pSettlementInfoConfirm->ConfirmTime);
+
+			//cout << "经纪公司代码:" << pSettlementInfoConfirm->BrokerID << endl
+			//	<< "用户账号:" << pSettlementInfoConfirm->InvestorID << endl
+			//	<< "确定日期：" << pSettlementInfoConfirm->ConfirmDate << endl
+			//	<< "确定时间：" << pSettlementInfoConfirm->ConfirmTime << endl;
 
 			//查询所有可用合约信息
 			CThostFtdcQryInstrumentField myreq = CThostFtdcQryInstrumentField();
@@ -197,16 +222,18 @@ void CtpTD::OnRspSettlementInfoConfirm(CThostFtdcSettlementInfoConfirmField* pSe
 			api->ReqQryInstrument(&myreq, requestID++);
 		}
 		else {
-			cout << "投资者结算结果确认响应为空, pSettlementInfoConfirm:" << pSettlementInfoConfirm << endl;
+			LOG("投资者结算结果确认响应为空, pSettlementInfoConfirm:\n");
+			//cout << "投资者结算结果确认响应为空, pSettlementInfoConfirm:" << pSettlementInfoConfirm << endl;
 		}
 	}
 	else {
-		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_INTENSITY | FOREGROUND_RED);
-		std::cout << "OnRspUserLogin error:"
-			<< pRspInfo->ErrorID
-			<< pRspInfo->ErrorMsg
-			<< std::endl;
-		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_INTENSITY);
+		LOG("OnRspSettlementInfoConfirm ERROR: [%d %s]\n", pRspInfo->ErrorID, pRspInfo->ErrorMsg);
+		//SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_INTENSITY | FOREGROUND_RED);
+		//std::cout << "OnRspSettlementInfoConfirm error:"
+		//	<< pRspInfo->ErrorID
+		//	<< pRspInfo->ErrorMsg
+		//	<< std::endl;
+		//SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_INTENSITY);
 	}
 }
 
@@ -228,12 +255,13 @@ void CtpTD::OnRspQryInstrument(CThostFtdcInstrumentField* pInstrument, CThostFtd
 		}
 	}
 	else {
-		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_INTENSITY | FOREGROUND_RED);
-		std::cout << "OnRspQryInstrument error:"
-			<< pRspInfo->ErrorID
-			<< pRspInfo->ErrorMsg
-			<< std::endl;
-		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_INTENSITY);
+		LOG("OnRspQryInstrument ERROR: [%d %s]\n", pRspInfo->ErrorID, pRspInfo->ErrorMsg);
+		//SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_INTENSITY | FOREGROUND_RED);
+		//std::cout << "OnRspQryInstrument error:"
+		//	<< pRspInfo->ErrorID
+		//	<< pRspInfo->ErrorMsg
+		//	<< std::endl;
+		//SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_INTENSITY);
 	}
 }
 
@@ -302,8 +330,12 @@ CThostFtdcOrderField CtpTD::ReqOrderInsert(CThostFtdcInputOrderField order)
 	this->rtn_order->RequestID = RTN_ORDER_INIT;
 	int iResult = this->api->ReqOrderInsert(order_insert, ++requestID);
 	delete order_insert;
-	std::cout << "order requestID: " << requestID - 1;
-	cerr << "--->>> 报单录入请求: " << ((iResult == 0) ? "成功" : "失败") << endl;
+
+	LOG("order requestID: [%D]\n", requestID - 1);
+	LOG("--->>> 报单录入请求: ");
+	LOG((iResult == 0) ? "成功\n" : "失败\n");
+	//std::cout << "order requestID: " << requestID - 1;
+	//cerr << "--->>> 报单录入请求: " << ((iResult == 0) ? "成功" : "失败") << endl;
 
 	if (iResult != 0)
 	{
@@ -315,14 +347,16 @@ CThostFtdcOrderField CtpTD::ReqOrderInsert(CThostFtdcInputOrderField order)
 	{
 
 	}
-	std::cout << " order id : " << this->rtn_order->OrderSysID << endl;
+	LOG(" order id : [%s]\n", this->rtn_order->OrderSysID);
+	//std::cout << " order id : " << this->rtn_order->OrderSysID << endl;
 
 	return 	*this->rtn_order;
 }
 
 void CtpTD::OnRspOrderInsert(CThostFtdcInputOrderField *pInputOrder, CThostFtdcRspInfoField *pRspInfo, int nRequestID, bool bIsLast)
 {
-	cerr << "--->>> " << "OnRspOrderInsert" << endl;
+	LOG("--->>> OnRspOrderInsert\n");
+	//cerr << "--->>> " << "OnRspOrderInsert" << endl;
 	if (nullptr == pRspInfo || 0 == pRspInfo->ErrorID)
 	{
 		if (bIsLast)
@@ -334,12 +368,13 @@ void CtpTD::OnRspOrderInsert(CThostFtdcInputOrderField *pInputOrder, CThostFtdcR
 		}
 	}
 	else {
-		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_INTENSITY | FOREGROUND_RED);
-		std::cout << "OnRspOrderInsert error:"
-			<< pRspInfo->ErrorID << ", "
-			<< pRspInfo->ErrorMsg
-			<< std::endl;
-		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_INTENSITY);
+		LOG("OnRspOrderInsert ERROR: [%d %s]\n", pRspInfo->ErrorID, pRspInfo->ErrorMsg);
+		//SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_INTENSITY | FOREGROUND_RED);
+		//std::cout << "OnRspOrderInsert error:"
+		//	<< pRspInfo->ErrorID << ", "
+		//	<< pRspInfo->ErrorMsg
+		//	<< std::endl;
+		//SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_INTENSITY);
 	}
 }
 
@@ -369,12 +404,13 @@ void CtpTD::OnRspQryInvestorPosition(CThostFtdcInvestorPositionField * pInvestor
 	}
 	else {
 		this->rtn_position->Position = POSITION_ERROR;
-		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_INTENSITY | FOREGROUND_RED);
-		std::cout << "OnRspQryTradingAccount error:"
-			<< pRspInfo->ErrorID
-			<< pRspInfo->ErrorMsg
-			<< std::endl;
-		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_INTENSITY);
+		LOG("OnRspQryTradingAccount ERROR: [%d %s]\n", pRspInfo->ErrorID, pRspInfo->ErrorMsg);
+		//SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_INTENSITY | FOREGROUND_RED);
+		//std::cout << "OnRspQryTradingAccount error:"
+		//	<< pRspInfo->ErrorID
+		//	<< pRspInfo->ErrorMsg
+		//	<< std::endl;
+		//SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_INTENSITY);
 	}
 }
 
@@ -392,12 +428,13 @@ void CtpTD::OnRspQryTradingAccount(CThostFtdcTradingAccountField * pTradingAccou
 	}
 	else {
 		strcpy(this->rtn_acc->TradingDay, ACC_TRADING_DAY_ERROR);
-		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_INTENSITY | FOREGROUND_RED);
-		std::cout << "OnRspQryTradingAccount error:"
-			<< pRspInfo->ErrorID
-			<< pRspInfo->ErrorMsg
-			<< std::endl;
-		SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_INTENSITY);
+		LOG("OnRspQryTradingAccount ERROR: [%d %s]\n", pRspInfo->ErrorID, pRspInfo->ErrorMsg);
+		//SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_INTENSITY | FOREGROUND_RED);
+		//std::cout << "OnRspQryTradingAccount error:"
+		//	<< pRspInfo->ErrorID
+		//	<< pRspInfo->ErrorMsg
+		//	<< std::endl;
+		//SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), FOREGROUND_INTENSITY);
 	}
 }
 
@@ -416,7 +453,8 @@ int CtpTD::ReqOrderAction(CThostFtdcInputOrderActionField pInputOrderAction)
 	pInputOrderAction.ActionFlag = THOST_FTDC_AF_Delete;
 	int iResult = this->api->ReqOrderAction(&pInputOrderAction, this->requestID++);
 	std::cout << "action order requestID: " << requestID;
-	cerr << "--->>> 撤单录入请求: " << ((iResult == 0) ? "成功" : "失败") << endl;
+	LOG("--->>> 撤单录入请求: [%s]\n", ((iResult == 0) ? "成功" : "失败"));
+	//cerr << "--->>> 撤单录入请求: " << ((iResult == 0) ? "成功" : "失败") << endl;
 	if (iResult == 0)
 	{
 		return requestID;
@@ -440,7 +478,8 @@ CThostFtdcInvestorPositionField CtpTD::ReqQryInvestorPosition(CThostFtdcQryInves
 	memset(this->rtn_position, 0, sizeof(CThostFtdcInvestorPositionField));
 	this->rtn_position->Position = POSITION_INIT;
 	int iResult = this->api->ReqQryInvestorPosition(&pQryInvestorPosition, requestID++);
-	cerr << "--->>> 查询持仓请求: " << ((iResult == 0) ? "成功" : "失败") << endl;
+	LOG("--->>> 查询持仓请求: [%s]\n", ((iResult == 0) ? "成功" : "失败"));
+	//cerr << "--->>> 查询持仓请求: " << ((iResult == 0) ? "成功" : "失败") << endl;
 	if (iResult != 0)
 	{
 		this->rtn_position->Position = POSITION_ERROR;
@@ -468,7 +507,8 @@ CThostFtdcTradingAccountField CtpTD::ReqQryTradingAccount()
 	memset(this->rtn_acc, 0, sizeof(CThostFtdcTradingAccountField));
 	strcpy(this->rtn_acc->TradingDay, ACC_TRADING_DAY_INIT);
 	int iResult = this->api->ReqQryTradingAccount(&pQryTradingAccount, requestID++);
-	cerr << "--->>> 查询资金请求: " << ((iResult == 0) ? "成功" : "失败") << endl;
+	LOG("--->>> 查询资金请求: [%s]\n", ((iResult == 0) ? "成功" : "失败"));
+	//cerr << "--->>> 查询资金请求: " << ((iResult == 0) ? "成功" : "失败") << endl;
 	if (iResult != 0)
 	{
 		strcpy(this->rtn_acc->TradingDay, ACC_TRADING_DAY_ERROR);
